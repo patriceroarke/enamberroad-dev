@@ -145,13 +145,12 @@
         <div class="container">
           <?php global $base_url; ?>
           <div class="social-links">
-            <a href="https://www.linkedin.com/company/amber-road/" title=""><img width="24" src="<?php echo $base_url.'../../../../../../'.drupal_get_path('theme', 'ar_theme'); ?>/img/linked_in_64px.png" alt="Follow Amber Road on LinkedIn" ></a>
-            <a href="http://twitter.com/GTMBestPractice" title=""><img width="24" src="<?php echo $base_url.'../../../../../../'.drupal_get_path('theme', 'ar_theme'); ?>/img/twitter_64px.png" alt="Follow Amber Road on Twitter"></a>
-            <a href="http://www.youtube.com/user/GTMBestPractices" title=""><img width="24" src="<?php echo $base_url.'../../../../../../'.drupal_get_path('theme', 'ar_theme'); ?>/img/youtube64px.png" alt="Subscribe to Amber Road’s Channel on YouTube"></a>
-            <a href="http://www.amberroad.com/html/rl_blogs.shtml" title=""><img width="24" src="<?php echo $base_url.'../../../../../../'.drupal_get_path('theme', 'ar_theme'); ?>/img/rss_64px.png" alt="Subscribe to Amber Road’s RSS Feed"></a>
-            <a href="http://www.facebook.com/pages/Amber+Road/507641042664548" title=""><img width="24" src="<?php echo $base_url.'../../../../../../'.drupal_get_path('theme', 'ar_theme'); ?>/img/facebook_64px.png" alt="Like Amber Road on Facebook"></a>
-            <a href="https://www.pinterest.com/gtmbestpractice" title=""><img width="24" src="<?php echo $base_url.'../../../../../../'.drupal_get_path('theme', 'ar_theme'); ?>/img/pinterest_64px.png" alt="Follow Amber Road on Pinterest"></a>
-
+            <a href="https://www.linkedin.com/company/amber-road/" title=""><img width="24" src="<?php echo $base_url.'/'.drupal_get_path('theme', 'ar_theme'); ?>/img/linked_in_64px.png" alt="Follow Amber Road on LinkedIn" ></a>
+            <a href="http://twitter.com/GTMBestPractice" title=""><img width="24" src="<?php echo $base_url.'/'.drupal_get_path('theme', 'ar_theme'); ?>/img/twitter_64px.png" alt="Follow Amber Road on Twitter"></a>
+            <a href="http://www.youtube.com/user/GTMBestPractices" title=""><img width="24" src="<?php echo $base_url.'/'.drupal_get_path('theme', 'ar_theme'); ?>/img/youtube64px.png" alt="Subscribe to Amber Road’s Channel on YouTube"></a>
+            <a href="http://www.amberroad.com/html/rl_blogs.shtml" title=""><img width="24" src="<?php echo $base_url.'/'.drupal_get_path('theme', 'ar_theme'); ?>/img/rss_64px.png" alt="Subscribe to Amber Road’s RSS Feed"></a>
+            <a href="http://www.facebook.com/pages/Amber+Road/507641042664548" title=""><img width="24" src="<?php echo $base_url.'/'.drupal_get_path('theme', 'ar_theme'); ?>/img/facebook_64px.png" alt="Like Amber Road on Facebook"></a>
+            <a href="https://www.pinterest.com/gtmbestpractice" title=""><img width="24" src="<?php echo $base_url.'/'.drupal_get_path('theme', 'ar_theme'); ?>/img/pinterest_64px.png" alt="Follow Amber Road on Pinterest"></a>
           </div>
           <div class="copyright"><span>&#169; 2019 Amber Road, Inc.</span></div>
         </div>

@@ -1,0 +1,61 @@
+.managementshtml {
+  .panels-generic-content-main-inside .field-name-body .field-item tr td img {
+    @include breakpoint (max-width 979px) {
+      width: 120px !important;
+    }
+  }
+}
+
+.eventsshtml {
+  .panels-generic-content-main-inside .field-name-body .field-item {
+    table td {
+      padding-bottom: 0;
+    }
+    span > br {
+      display: none;
+    }
+  }
+}
+
+.node-type-page.partnersshtml {
+  .panels-generic-content-main-inside {
+    max-width: 995px;
+    padding-left: 0;
+    .field-name-body .field-item {
+      .content2 {
+        padding-left: 3px;
+        padding-right: 3px;
+        vertical-align: text-top;
+        @include breakpoint($tab) {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+    }
+    .pane-page-title, .pane-page-breadcrumb {
+      padding-left: 15px;
+      @include breakpoint($tab-wide) {
+        padding-left: 37px;
+      }
+    }
+    .pane-node-body {
+      margin-top: 15px;
+      table {
+        max-width: 980px;
+        td {
+          padding: 0;
+        }
+        img {
+          margin-left: 5px;
+          margin-right: 5px;
+          width: 62px !important;
+          @include breakpoint($tab) {
+            margin-left: 25px;
+            margin-right: 25px;
+            width: auto !important;
+          }
+        }
+      }
+    }
+  }
+}

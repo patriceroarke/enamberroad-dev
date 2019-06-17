@@ -1,0 +1,89 @@
+.page-html-pressshtml {
+  .panels-amber-content-layout {
+    padding-bottom: 50px;
+  }
+  .panels-generic-content-sidebar-inside {
+    text-align: center;
+    @include breakpoint($tab) {
+      margin-top: 5.3%;
+    }
+    @include breakpoint($tab-wide) {
+      margin-top: 9.3%;
+      margin-right: 8px;
+    }
+  }
+  .panels-generic-content-main-inside.has-sidebar {
+    padding-right: 11px;
+    @include breakpoint($tab) {
+      margin-right: 5px;
+    }
+    .view-footer {
+      margin-bottom: 22px;
+      margin-left: 23.2%;
+      margin-right: 3%;
+      border-bottom: 1px solid black;
+      .more-link {
+        font-weight: 700;
+        text-align: left;
+        padding-bottom: 24px;
+      }
+      &::after {
+        box-shadow: 0 1px 1px gray;
+        content: "";
+        display: block;
+        height: 1px;
+      }
+    }
+    .pane-awards-list .view-footer {
+      border-bottom: medium none;
+      &::after {
+        height: 0;
+      }
+      margin-bottom: 10px;
+      margin-left: 35.7%;
+      @include breakpoint($tab) {
+        margin-left: 28.6%;
+      }
+    }
+    .pane-views-panes {
+      h2.pane-title {
+        font-size: convert(11, pts, px);
+        font-variant: normal;
+        font-weight: 700;
+        margin-bottom: 9px;
+      }
+    }
+  }
+  .view-press-release, .view-press-coverage {
+    .views-row {
+      line-height: 20px;
+      margin-bottom: 20px;
+      @include clearfix;
+    }
+    .views-field-field-press-release-date {
+      width: 23.2%;
+      float: left;
+      padding-right: 8px;
+      @include breakpoint($tab) {
+        padding-right: 20px;
+      }
+    }
+    .views-field-title, .field-press-coverage-group {
+      vertical-align: top;
+      width: 76.8%;
+      float: left;
+    }
+  }
+  .view-awards-teaser-list {
+    .views-field-field-award-logo {
+      @include breakpoint($tab) {
+        width: 26.3%;
+      }
+    }
+    .field-award-group {
+      @include breakpoint($tab) {
+        width: 70.6%;
+      }
+    }
+  }
+}

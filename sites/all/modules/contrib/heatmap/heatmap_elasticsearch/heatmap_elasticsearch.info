@@ -1,0 +1,14 @@
+name = "HeatMap Elasticsearch"
+description = "HeatMap add-on that saves to Elasticsearch for performance."
+core = "7.x"
+package = Statistics
+configure = admin/config/system/heatmap
+dependencies[] = heatmap
+dependencies[] = elasticsearch_connector
+
+; Information added by Drupal.org packaging script on 2015-02-15
+version = "7.x-1.0-alpha1"
+core = "7.x"
+project = "heatmap"
+datestamp = "1424031182"
+

@@ -1,0 +1,164 @@
+mlid,ref_parent,path,title,Level
+1,0,enterprise/home.shtml,enterprise suite,0
+2,1,enterprise/sourcing-optimization.shtml,Sourcing Optimization,1
+3,2,enterprise/import-compliance.shtml,Import compliance information,2
+4,2,enterprise/landed-cost-calculation.shtml,Landed cost calculation,2
+5,2,enterprise/sourcing-analysis.shtml,Sourcing analysis,2
+6,1,enterprise/supplier-management.shtml,Supplier Management,1
+7,6,enterprise/document-management.shtml,Document management,2
+8,6,enterprise/import-product-classification-sm.shtml,Product classification and admissibility review,2
+9,6,enterprise/purchase-order-management.shtml,Purchase order management,2
+10,6,enterprise/supplier-solicitation.shtml,Supplier solicitation / compliance questionnaires,2
+11,1,enterprise/transportation-management.shtml,Transportation Management,1
+12,11,enterprise/contract-management.shtml,Contract and rate management,2
+13,11,enterprise/carrier-selection.shtml,Carrier selection and booking,2
+14,11,enterprise/freight-audit.shtml,Freight audit,2
+15,1,enterprise/export-management.shtml,Export Management,1
+16,15,enterprise/aes-filing.shtml,AES filing,2
+17,15,enterprise/deemed-exports.shtml,Deemed exports,2
+18,15,enterprise/export-document-management.shtml,Document management,2
+19,15,enterprise/end-use-management.shtml,End-use management,2
+20,15,enterprise/export-compliance.shtml,Export compliance,2
+21,15,enterprise/freight-forwarder-collaboration.shtml,Freight forwarder collaboration,2
+22,15,enterprise/itar.shtml,ITAR Compliance,2
+23,15,enterprise/license-determination.shtml,License management,2
+24,15,enterprise/export-product-classification.shtml,Product classification,2
+25,15,enterprise/restricted-party-screening.shtml,Restricted party screening,2
+26,1,enterprise/supply-chain-visibility.shtml,Supply Chain Visibility,1
+27,26,enterprise/data-quality-management.shtml,Data quality management,2
+28,26,enterprise/integrated-service-provider-network.shtml,Integrated service provider network,2
+29,26,enterprise/performance-management.shtml,Performance management reporting,2
+30,26,enterprise/order-and-shipment-visibility.shtml,Order and shipment Visibility,2
+31,1,enterprise/import-management.shtml,Import Management,1
+32,31,enterprise/import-document-management.shtml,Document management,2
+33,31,enterprise/entry-management.shtml,Entry management,2
+34,31,enterprise/landed-cost-calculation-im.shtml,Landed cost calculation,2
+35,31,enterprise/post-entry-management.shtml,Post-entry actions,2
+36,31,enterprise/import-product-classification.shtml,Product classification and admissibility review,2
+37,31,enterprise/importer-security-filing.shtml,Security filing,2
+38,1,enterprise/duty-management.shtml,Duty Management,1
+39,38,enterprise/trade-agreements.shtml,Trade agreements,2
+40,39,enterprise/bill-of-material-qualification.shtml,Bill of material qualification,3
+41,39,enterprise/certificate-management.shtml,Certificate management,3
+42,39,enterprise/product-claim-details.shtml,Product claim details and storage,3
+43,39,enterprise/ta-supplier-solicitation.shtml,Supplier solicitation campaigns,3
+44,39,enterprise/trade-agreement-identification.shtml,Trade agreement identification,3
+45,38,enterprise/foreign-trade-zone.shtml,Foreign-trade zone,2
+46,38,enterprise/china-trade-management.shtml,China trade management,2
+47,0,mid-market/home.shtml,mid-market solutions,0
+48,47,mid-market/sourcing-optimization.shtml,Sourcing Optimization,1
+49,48,mid-market/import-compliance-information.shtml,Import compliance information,2
+50,48,mid-market/landed-cost-calculation.shtml,Landed cost calculation,2
+51,48,mid-market/sourcing-analysis.shtml,Sourcing analysis,2
+52,47,mid-market/transportation-management.shtml,Transportation Management,1
+53,52,mid-market/contract-management.shtml,Contract and rate management,2
+54,52,mid-market/carrier-selection.shtml,Carrier selection and booking,2
+55,52,mid-market/freight-audit.shtml,Freight audit,2
+56,47,mid-market/export-management.shtml,Export Management,1
+57,56,mid-market/aes-filing.shtml,AES filing,2
+58,56,mid-market/deemed-exports.shtml,Deemed exports,2
+59,56,mid-market/export-document-management.shtml,Document management,2
+60,56,mid-market/end-use-management.shtml,End-use management,2
+61,56,mid-market/export-compliance.shtml,Export compliance,2
+62,56,mid-market/export-filing.shtml,Freight forwarder collaboration,2
+63,56,mid-market/license-determination.shtml,License determination and  management,2
+64,56,mid-market/export-product-classification.shtml,Product classification,2
+65,56,mid-market/restricted-party-screening.shtml,Restricted party screening,2
+66,47,mid-market/supply-chain-visibility.shtml,Supply Chain Visibility,1
+67,66,mid-market/data-management.shtml,Data quality management,2
+68,66,mid-market/integrated-service-provider-network.shtml,Integrated service provider network,2
+69,66,mid-market/performance-management.shtml,Performance management reporting,2
+70,66,mid-market/order-visibility.shtml,Order and shipment  visibility,2
+71,0,global-knowledge.shtml,global knowledge®,0
+72,71,global-knowledge.shtml,Global Trade Content - Global Knowledge,1
+73,72,global-knowledge/dissemination-process.shtml,Content Collection, Interpretation, &amp; Dissemination Process,2
+74,72,global-knowledge/trade-content-professionals.shtml,In-House Trade Content Professionals,2
+75,71,global-knowledge/trade-regulatory-content.shtml,Depth &amp; Breadth of Trade Regulatory Content,1
+76,75,global-knowledge/document-determination.shtml,Document Determination,2
+77,75,global-knowledge/duties-taxes-fees.shtml,Duties, Taxes, and Fees,2
+78,75,global-knowledge/electronic-filing.shtml,Electronic Filing,2
+79,75,global-knowledge/export-regulations.shtml,Export Regulations,2
+80,75,global-knowledge/freight-rates.shtml,Freight Rates,2
+81,75,global-knowledge/import-regulations.shtml,Import Regulations,2
+82,75,global-knowledge/restricted-party-lists.shtml,Restricted Party Lists,2
+83,75,global-knowledge/trade-agreement-rules.shtml,Trade Agreement Rules,2
+84,75,global-knowledge/transportation-schedules.shtml,Transportation Schedules,2
+85,0,html/resources.shtml,resources,0
+86,85,html/resources.shtml#literature,Literature,1
+87,86,html/rl_analyst_reports.shtml,Analyst &amp; Industry Reports,2
+88,86,html/rl_brochures.shtml,Brochures,2
+89,86,html/rl_case_studies.shtml,Case Studies,2
+90,86,html/rl_ebooks.shtml,eBooks,2
+91,86,http://info.amberroad.com/rl_gtmsuccess.html,GTM Success Kits,2
+92,86,html/rl_white_papers.shtml,White Papers,2
+93,85,html/resources.shtml#newsletter,GTM Newsletter,1
+94,93,http://info.amberroad.com/gtm.html,Subscribe,2
+95,85,html/resources.shtml#media,Multi-Media,1
+96,95,http://stream.amberroad.com/overview/index.html,Amber Road Video,2
+97,95,http://stream.amberroad.com/gtm_ondemand/index.html,GTM Videos,2
+98,95,html/rl_podcasts.shtml,Podcasts,2
+99,95,html/rl_product_tours.shtml,Product Tours,2
+100,95,html/rl_webinars.shtml,Archived Webinars,2
+101,85,html/resources.shtml#community,Community,1
+102,101,html/rl_blogs.shtml,Blogs,2
+103,101,http://www.linkedin.com/groupInvitation?groupID=2374608&sharedKey=1A2F3F6276F1,LinkedIn,2
+104,101,http://twitter.com/GTMBestPractice,Twitter,2
+105,101,http://www.youtube.com/user/GTMBestPractices,YouTube,2
+106,101,http://www.facebook.com/pages/Amber+Road/507641042664548,Facebook,2
+107,101,https://plus.google.com/100833232171840180230?prsrc=3,Google+,2
+108,101,http://www.pinterest.com/gtmbestpractice/,Pinterest,2
+109,85,html/resources.shtml#industry,Industry Resources,1
+110,109,html/rl_acronyms.shtml,Acronyms,2
+111,109,html/rl_country_links.shtml,Country Links,2
+112,109,html/rl_faq.shtml,FAQs on Trade Regulations,2
+113,109,html/rl_glossary.shtml,Glossary,2
+114,109,html/rl_incoterms.shtml,Incoterms,2
+115,85,html/resources.shtml#nextsteps,Next Steps,1
+116,115,html/contact_us.shtml,Contact Us,2
+117,115,http://info.amberroad.com/rl_rd.html,Request a Demo,2
+118,0,html/company.shtml,Company,0
+119,118,html/about_us.shtml,About Us,1
+120,119,html/customers.shtml,Customers,2
+121,119,html/management.shtml,Management Team,2
+122,119,html/testimonials.shtml,Testimonials,2
+123,118,html/contact_us.shtml,Contact Us,1
+124,123,html/cu_customer_support.shtml,Customer Support,2
+125,123,http://info.amberroad.com/contact_question.html,Have a Question?,2
+126,123,http://info.amberroad.com/rl_rd.html,Request Demo,2
+127,118,http://investor.amberroad.com/,Investor Relations,1
+128,118,html/events.shtml,Events,1
+129,128,html/industry_events.shtml,Industry Conferences,2
+130,128,html/seminars.shtml,Seminars,2
+131,128,html/evolve12.shtml,User Conference - eVOLVE,2
+132,128,html/webinars.shtml,Upcoming Webinars,2
+133,118,html/careers.shtml,Careers,1
+134,133,html/careers_ap.shtml,Asia Pacific,2
+135,133,html/careers_eu.shtml,Europe,2
+136,133,html/careers_ind.shtml,India,2
+137,133,html/careers_us.shtml,US,2
+138,118,html/partners.shtml,Partners,1
+139,118,html/services.shtml,Services,1
+140,139,html/customer_support.shtml,24 x 7 Customer Support,2
+141,139,html/implementation_methodology.shtml,Implementation Methodology,2
+142,139,html/professional_services.shtml,Professional Services Team,2
+143,118,html/press.shtml,Press Room,1
+144,143,html/awards.shtml,Awards,2
+145,143,html/press_coverage.shtml,Press Coverage,2
+146,143,html/press_releases.shtml,Press Releases,2
+147,118,html/platform.shtml,Platform,1
+148,147,html/trading_partner_network.shtml,Trading Partner Network,2
+149,147,html/technology_platform.shtml,Technology Platform,2
+150,118,html/industries.shtml,Industries,1
+151,150,html/aerospace.shtml,Aerospace and Defense,2
+152,150,html/apparel.shtml,Apparel,2
+153,150,html/automotive.shtml,Automotive,2
+154,150,html/chemical.shtml,Chemical,2
+155,150,html/consumer_goods.shtml,Consumer Goods,2
+156,150,html/financial_services.shtml,Financial Services,2
+157,150,html/technology.shtml,High Technology,2
+158,150,html/higher_education.shtml,Higher Education,2
+159,150,html/life_sciences.shtml,Life Sciences,2
+160,150,html/logistics_providers.shtml,Logistics Providers,2
+161,150,html/manufacturing.shtml,Manufacturing,2
+162,150,html/oil_and_gas.shtml,Oil and Gas,2
+163,150,html/retail.shtml,Retail,2

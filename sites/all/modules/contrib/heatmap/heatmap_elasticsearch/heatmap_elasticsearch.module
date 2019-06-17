@@ -1,0 +1,300 @@
+<?php
+
+define('HEATMAP_INDEXNAME', 'drupal_heatmap');
+define('HEATMAP_TYPENAME', 'heatmap');
+
+/**
+ * Implements hook_heatmapinfo
+ */
+function heatmap_elasticsearch_heatmap_info() {
+  $info = array();
+  
+  $info['name'] = t('Elasticsearch');
+  
+  return $info;
+}
+
+/**
+ * Implements hook_heatmap_settings
+ */
+function heatmap_elasticsearch_heatmap_settings() {
+  $form = array();
+  
+  if (!class_exists('\Elasticsearch\Client') || !module_exists('elasticsearch_connector')) {
+    $form['heatmap_disabled'] = array(
+      '#markup' => t('Please install the elasticsearch connector !correctly.', array('!correctly' => l(t('correctly'), 'https://www.drupal.org/project/elasticsearch_connector')))
+    );
+    
+    return $form;
+  }
+  
+  $temp = elasticsearch_connector_clusters();
+  $clusters = array();
+  foreach($temp as $key => $value) {
+    $clusters[$key] = $value->name;
+  }
+  
+  $form['heatmap_elasticsearch_cluster'] = array(
+    '#type' => 'select',
+    '#title' => t('Elasticsearch Cluster'),
+    '#description' => t('Choose the Elasticsearch cluster too use among the ones setup in !connector.', array('!connector' => l(t('elasticsearch connector'), 'admin/config/elasticsearch-connector/clusters'))),
+    '#options' => $clusters,
+    '#default_value' => variable_get('heatmap_elasticsearch_cluster', '')
+  );
+  
+  return $form;
+}
+
+/**
+ * Implements hook_heatmap_validation (works as validate hook)
+ */
+function heatmap_elasticsearch_heatmap_validation($values) {
+  if (!class_exists('\Elasticsearch\Client')) {
+    form_set_error('heatmap_storage_type', t('You have to install the !client in your libraries directory.', array('!client' => l(t('Elasticsearch Client'), 'http://www.elasticsearch.org/guide/en/elasticsearch/client/php-api/current/'))));
+  } else {
+    if ($values['heatmap_elasticsearch_cluster'] == '') {
+      form_set_error('heatmap_elasticsearch_cluster', t('Please choose an Elasticsearch cluster.'));
+    }
+  }
+}
+
+/**
+ * Implements hook_heatmap_submitting (works as submit hook)
+ */
+function heatmap_elasticsearch_heatmap_submitting($values) {
+  // Create elasticsearch bucket if it does not exist
+  $client = elasticsearch_connector_get_client_by_id($values['heatmap_elasticsearch_cluster']);
+  if ($client) {
+    $new_index['index']  = HEATMAP_INDEXNAME;
+    $exist = $client->indices()->exists($new_index);
+    if (!$exist) {
+      $mapping = array('properties' => array(
+        'url' => array('type' => 'string', 'index' => 'not_analyzed'),
+        'browser_language' => array('type' => 'string', 'index' => 'not_analyzed'),
+        'clickdata' => array('type' => 'string', 'index' => 'not_analyzed'),
+        'mousedata' => array('type' => 'string', 'index' => 'not_analyzed'),
+        'positiondata' => array('type' => 'string', 'index' => 'not_analyzed'),
+        'country' => array('type' => 'string', 'index' => 'not_analyzed'),
+        'time_added' => array('type' => 'integer'),
+        'navigator' => array('type' => 'integer'),
+        'browser_width' => array('type' => 'integer'),
+      ));
+      $new_index['body']['mappings'][HEATMAP_TYPENAME] = $mapping;
+      $client->indices()->create($new_index);
+    }
+  }
+  return $values;
+}
+
+/*
+ * Implements hook_heatmap_get for normal storage, needs to load all on url because of how couchdb works
+ */
+function heatmap_elasticsearch_heatmap_get($params) {
+  $terms[]['term']['url'] = trim($params['url'], '/');
+  if($params['width']) {
+    $terms[]['term']['browser_width'] = $params['width'];
+  }
+  
+  if($params['language']) {
+    $terms[]['term']['browser_language'] = $params['language'];
+  }  
+  
+  if($params['country']) {
+    $terms[]['term']['country'] = $params['country'];
+  }
+  
+  if($params['navigator']) {
+    $terms[]['term']['navigator'] = $params['navigator'];
+  }
+  $fromdate = strtotime($params['fromdate']);
+  $todate = strtotime($params['todate']);
+
+  $terms[]['numeric_range']['time_added'] = array('gte' => $fromdate, 'lte' => $todate);
+
+  $client = elasticsearch_connector_get_client_by_id(variable_get('heatmap_elasticsearch_cluster', ''));
+  $search['index'] = HEATMAP_INDEXNAME;
+  $search['type'] = HEATMAP_TYPENAME;
+  $search['size'] = -1;
+  $search['body'] = array(
+    'query' => array(
+      'filtered' => array(
+        'filter' => array(
+          $terms
+        ),
+        'query' => array(
+          'match_all' => array()
+        )
+      )
+    )
+  );
+  $results = $client->search($search);
+  $returnarray = array();
+  if($results['hits']['hits']) {
+    foreach($results['hits']['hits'] as $key => $doc) {
+      $returnarray[] = (object) $doc['_source'];
+    }
+  }
+  return $returnarray;
+}
+
+/*
+ * Implements hook_heatmap_getwidths
+ */
+function heatmap_elasticsearch_heatmap_getwidths() {
+  $cache = cache_get('heatmap_widths');
+  if(!$cache) {
+    $client = elasticsearch_connector_get_client_by_id(variable_get('heatmap_elasticsearch_cluster', ''));
+    $search['index'] = HEATMAP_INDEXNAME;
+    $search['type'] = HEATMAP_TYPENAME;
+    $search['size'] = -1;
+    $search['body']['aggs']['widths']['terms']['field'] = 'browser_width';
+    $results = $client->search($search);
+    $return = array();
+    if(isset($results['aggregations']['widths']['buckets'])) {
+      foreach($results['aggregations']['widths']['buckets'] as $key => $value) {
+        $return[$value['key']] = $value['key'] . 'px';
+      }
+    }
+    // Heavy query - cache long time
+    cache_set('heatmap_widths', $return, 'cache', (time()+43200));
+  } else {
+    $return = $cache->data;
+  }
+  
+  return $return;
+}
+
+/*
+ * Implements hook_heatmap_heatmap_getlanguage
+ */
+function heatmap_elasticsearch_heatmap_getlanguages() {
+  $cache = cache_get('heatmap_languages');
+  if(!$cache) {
+    $client = elasticsearch_connector_get_client_by_id(variable_get('heatmap_elasticsearch_cluster', ''));
+    $search['index'] = HEATMAP_INDEXNAME;
+    $search['type'] = HEATMAP_TYPENAME;
+    $search['size'] = -1;
+    $search['body']['aggs']['languages']['terms']['field'] = 'browser_language';
+    $results = $client->search($search);
+    $return = array();
+    if(isset($results['aggregations']['languages']['buckets'])) {
+      foreach($results['aggregations']['languages']['buckets'] as $key => $value) {
+        $return[$value['key']] = $value['key'];
+      }
+    }
+    // Heavy query - cache long time
+    cache_set('heatmap_languages', $return, 'cache', (time()+43200));
+  } else {
+    $return = $cache->data;
+  }
+  return $return;
+}
+
+/*
+ * Implements hook_heatmap_single
+ */
+function heatmap_elasticsearch_heatmap_single($data) {
+  $client = elasticsearch_connector_get_client_by_id(variable_get('heatmap_elasticsearch_cluster', ''));
+  $data['time_added'] = strtotime(date('Y-m-d'));
+  
+  $send['index'] = HEATMAP_INDEXNAME;
+  $send['type'] = HEATMAP_TYPENAME;
+  $send['id'] = $data['id'] ? $data['id'] : md5(time() . microtime());
+  $send['body'] = $data;
+  $client->index($send);
+    
+  return $send['id'];
+}
+
+/*
+ * Implements hook_heatmap_batch
+ */
+function heatmap_elasticsearch_heatmap_batch($rows) {
+ 
+  $client = elasticsearch_connector_get_client_by_id(variable_get('heatmap_elasticsearch_cluster', ''));
+  $newrows = array();
+  foreach($rows as $key => $row) {
+    $row['time_added'] = strtotime(date('Y-m-d'));
+    $newrows[]['index']['_id'] = md5(time() . microtime());
+    $newrows[] = $row;
+  }
+
+  if(isset($newrows) && count($newrows)) {
+    $send['index'] = HEATMAP_INDEXNAME;
+    $send['type'] = HEATMAP_TYPENAME; 
+    $send['body'] = $newrows;
+    $client->bulk($send);
+  }
+}
+
+/*
+ * Implements hook_heatmap_heatmap_aggregate
+ */
+function heatmap_elasticsearch_heatmap_aggregate($time) {
+  $client = elasticsearch_connector_get_client_by_id(variable_get('heatmap_elasticsearch_cluster', ''));
+  $search['index'] = HEATMAP_INDEXNAME;
+  $search['type'] = HEATMAP_TYPENAME;
+  $search['size'] = -1;
+  $search['body'] = array(
+    'query' => array(
+      'filtered' => array(
+        'filter' => array(
+          'term' => array(
+            'time_added' => $time
+          )
+        ),
+        'query' => array(
+          'match_all' => array()
+        )
+      )
+    )
+  );
+  $results = $client->search($search);
+  $savearray = array();
+  if($results['hits']['hits']) {
+    foreach($results['hits']['hits'] as $key => $doc) {
+      $data = (object) $doc['_source'];
+      $key = md5($data->navigator . '_' . $data->browser_width . '_' . $data->browser_language . '_' . $data->url . '_' . $data->country);
+      if(isset($savearray[$key])) {
+        $savearray[$key]->removes[] = $doc['_id'];
+        $savearray[$key]->counter++;
+        $savearray[$key]->clickdata = heatmap_combine_data($savearray[$key]->clickdata, json_decode($data->clickdata));
+        $savearray[$key]->mousedata = heatmap_combine_data($savearray[$key]->mousedata, json_decode($data->mousedata));
+        $savearray[$key]->positiondata = heatmap_combine_positiondata($savearray[$key]->positiondata, json_decode($data->positiondata));
+      } else {
+        $savearray[$key] = $data;
+        $savearray[$key]->counter = 1;
+        $savearray[$key]->removes = array($doc['_id']);
+        $savearray[$key]->mousedata = json_decode($data->mousedata);
+        $savearray[$key]->clickdata = json_decode($data->clickdata);
+        $savearray[$key]->positiondata = json_decode($data->positiondata);
+        unset($savearray[$key]->_id);
+        unset($savearray[$key]->_rev);
+      }      
+    }
+  }
+
+  $delete['index'] = HEATMAP_INDEXNAME;
+  $delete['type'] = HEATMAP_TYPENAME;  
+  $newarray = array();
+  foreach($savearray as $key => $array) {
+    if($array->counter > 1) {
+      foreach($array->removes as $id) {
+        $delete['id'] = $id;
+        $client->delete($delete);
+      }
+      unset($array->removes);
+      unset($array->counter);
+      unset($array->id);
+      $array->mousedata = json_encode($array->mousedata);
+      $array->clickdata = json_encode($array->clickdata);
+      $array->positiondata = json_encode($array->positiondata);
+      $newarray[]['index']['_id'] = md5(time() . microtime());
+      $newarray[] = (array) $array;
+    }
+  }
+  
+  if(count($newarray)) {
+    $client->bulk($newarray);
+  }
+}

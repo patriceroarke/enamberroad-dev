@@ -1,0 +1,54 @@
+<?php
+/**
+ * @file
+ * Responsive panels layouts for Panopoly.
+ */
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function ed_layouts_ctools_plugin_directory($module, $plugin) {
+  return 'plugins/' . $plugin;
+}
+
+/**
+ * Implements hook_ctools_plugin_post_alter().
+ *
+ * @param $plugin
+ * @param $info
+ */
+function ed_layouts_ctools_plugin_post_alter(&$plugin, &$info) {
+  // Switch Panopoly Layouts to Radix Layouts.
+  if ($info['type'] == 'layouts' && $plugin['module'] == 'panopoly_theme') {
+    if (strpos($plugin['theme'], 'radix_') === FALSE) {
+      $new_name = 'radix_' . $plugin['theme'];
+      $path = drupal_get_path('module', 'ed_layouts') . '/plugins/layouts/' . $new_name;
+/*      if (file_exists($path)) {
+        $plugin['theme'] = $new_name;
+        $plugin['file'] = 'radix_' . $plugin['file'];
+        $plugin['path'] = $path;
+        $plugin['icon'] = 'radix-' . $plugin['icon'];
+        unset($plugin['css']);
+      }*/
+    }
+  }
+}
+
+
+/**
+ * Implements hook_preprocess_page().
+ * Create naming suggestions for the layouts
+ * @param $vars
+ */
+function ed_layouts_preprocess_page(&$vars) {
+  //$panel_page = page_manager_get_current_page();
+  $panel = panels_get_current_page_display();
+  if(is_object($panel)){
+    $layout = $panel->layout;
+  }
+  if (isset($layout) && strpos($layout, 'easydisplay') !== FALSE) {
+    $layout = str_replace('-', '_', $layout);
+    $vars['theme_hook_suggestions'][] = 'page__ed_layout';
+    $vars['theme_hook_suggestions'][] = 'page__ed_layout_' . $layout;
+  }
+}

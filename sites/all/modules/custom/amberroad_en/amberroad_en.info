@@ -1,0 +1,4 @@
+name = "Amberroad EN"
+description = "Functionality dedicated to the US site only"
+core = 7.x
+package = "Amberroad"

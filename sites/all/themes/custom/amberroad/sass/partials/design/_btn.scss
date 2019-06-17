@@ -1,0 +1,42 @@
+%btn {
+  font-family: $base-font-family;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 24px;
+  font-weight: normal;
+  display: inline-block;
+}
+
+.btn--orange {
+  @extend %btn;
+
+  background: none repeat scroll 0 0 #f6a664;
+  border: medium none;
+  border-radius: 5px;
+  -webkit-box-shadow:  0 -12px 1px 0 #eb7510 inset, 6px 6px 2px -3px rgba(0, 0, 0, 0.4), 0 -23px rgba(255, 255, 255, 0.25) inset;
+  -moz-box-shadow:  0 -12px 1px 0 #eb7510 inset, 6px 6px 2px -3px rgba(0, 0, 0, 0.4), 0 -23px rgba(255, 255, 255, 0.25) inset;
+  box-shadow: 0 -12px 1px 0 #eb7510 inset, 6px 6px 2px -3px rgba(0, 0, 0, 0.4), 0 -23px rgba(255, 255, 255, 0.25) inset;
+  color: white;
+  font-size: 11px;
+  height: 22px;
+  min-width: 100px;
+  line-height: 22px;
+}
+
+.btn--round {
+  @extend %btn;
+
+  background: rgba(255, 211, 182, 0.65);
+  border-top: 2px solid #d33e00;
+  border-bottom: 1px solid #d33e00;
+  border-left: 1px solid #d33e00;
+  border-image: none;
+  border-radius: 50px;
+  -webkit-box-shadow: 0 -6px 0 8px #faa500 inset, -5px -3px 4px rgba(0, 0, 0, 0.4), 0 -47px rgba(255, 255, 255, 0.25) inset;
+  -moz-box-shadow: 0 -6px 0 8px #faa500 inset, -5px -3px 4px rgba(0, 0, 0, 0.4), 0 -47px rgba(255, 255, 255, 0.25) inset;
+  box-shadow: 0 -6px 0 8px #faa500 inset, -5px -3px 4px rgba(0, 0, 0, 0.4), 0 -47px rgba(255, 255, 255, 0.25) inset;
+  color: black;
+  font-size: 16px;
+  height: 38px;
+  min-width: 188px;
+}

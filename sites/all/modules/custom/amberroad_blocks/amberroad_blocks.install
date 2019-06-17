@@ -1,0 +1,145 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall blocks.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Perform actions to set up the site's blocks
+ *
+ * @see system_install()
+ */
+function amberroad_blocks_install() {
+  // Enable some standard blocks.
+  $default_theme = 'amberroad';
+  $blocks = array(
+    array(
+      'module' => 'menu',
+      'delta' => 'menu-header',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -30,
+      'region' => 'header',
+      'pages' => '',
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+    array(
+      'module' => 'menu',
+      'delta' => 'menu-footer-top',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -20,
+      'region' => 'footer_column_middle',
+      'pages' => '',
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+    array(
+      'module' => 'menu',
+      'delta' => 'menu-footer-bottom',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -10,
+      'region' => 'footer_column_middle',
+      'pages' => '',
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+    array(
+      'module' => 'tb_megamenu',
+      'delta' => 'amberroad-main-menu',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -10,
+      'region' => 'main_prefix',
+      'pages' => '',
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+    array(
+      'module' => 'amberroad_blocks',
+      'delta' => 'footer_social_links_left',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -20,
+      'region' => 'footer_column_left',
+      'pages' => '',
+      'cache' => DRUPAL_NO_CACHE,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+    array(
+      'module' => 'amberroad_blocks',
+      'delta' => 'footer_social_links_right',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -20,
+      'region' => 'footer_column_right',
+      'pages' => '',
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+    array(
+      'module' => 'amberroad_blocks',
+      'delta' => 'footer_copyright',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -9,
+      'region' => 'footer_column_middle',
+      'pages' => '',
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+    array(
+      'module' => 'amberroad_blocks',
+      'delta' => 'footer_social_links_mobile',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -20,
+      'region' => 'footer_column_mobile',
+      'pages' => '',
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+    array(
+      'module' => 'amberroad_blocks',
+      'delta' => 'header_language_switch_flags',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -10,
+      'region' => 'header',
+      'pages' => '',
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+    array(
+      'module' => 'blockify',
+      'delta' => 'blockify-logo',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -40,
+      'region' => 'header',
+      'pages' => '',
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+    array(
+      'module' => 'search',
+      'delta' => 'form',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -20,
+      'region' => 'header',
+      'pages' => '',
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    ),
+  );
+
+  // Install all defined blocks.
+  _amberroad_blocks_install_blocks($blocks);
+
+}
+

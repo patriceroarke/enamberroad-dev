@@ -1,0 +1,53 @@
+.page-html-press-coverageshtml {
+  .pane-page-breadcrumb {
+    margin-bottom: 20px;
+  }
+  .panels-generic-content-main-inside.has-sidebar {
+    @include breakpoint($tab) {
+      margin-right: 0;
+      width: 73.576%;
+    }
+  }
+  .panels-generic-content-sidebar-inside {
+    text-align: center;
+    margin-bottom: 30px;
+    @include breakpoint($tab) {
+      margin-top: 5.7%;
+      margin-right: 2.2%;
+    }
+    @include breakpoint($tab-wide) {
+      margin-top: 118px;
+    }
+  }
+  .view-press-coverage {
+    .views-row {
+      line-height: 19px;
+      margin-bottom: 15px;
+      @include clearfix;
+    }
+    .views-field-field-press-release-date {
+      width: 24%;
+      float: left;
+      padding-right: 8px;
+      @include breakpoint($tab) {
+        padding-right: 20px;
+      }
+    }
+    .field-press-coverage-group {
+      float: left;
+      width: 76%;
+      @include breakpoint($tab) {
+        padding-right: 20px;
+      }
+    }
+    .view-field-press-coverage-source {
+      font-style: italic;
+    }
+    .view-field-body {
+      padding-right: 20px;
+      p {
+        margin-top: 10px;
+      }
+    }
+  }
+}

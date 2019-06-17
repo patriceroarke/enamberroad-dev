@@ -1,0 +1,55 @@
+name = Amber Road
+description = The Amber Road installation profile enabling required core modules and the amberroad_main module.
+version = VERSION
+core = 7.x
+
+; core
+dependencies[] = block
+dependencies[] = color
+dependencies[] = contextual
+dependencies[] = dashboard
+dependencies[] = help
+dependencies[] = image
+dependencies[] = list
+dependencies[] = menu
+dependencies[] = number
+dependencies[] = options
+dependencies[] = path
+dependencies[] = taxonomy
+dependencies[] = dblog
+dependencies[] = search
+dependencies[] = shortcut
+dependencies[] = field_ui
+dependencies[] = file
+dependencies[] = rdf
+
+; contrib
+dependencies[] = admin_menu
+dependencies[] = admin_menu_toolbar
+dependencies[] = ctools
+dependencies[] = panels
+dependencies[] = views
+dependencies[] = html5_tools
+dependencies[] = magic
+dependencies[] = magic_dev
+dependencies[] = blockify
+dependencies[] = ckeditor
+;dependencies[] = modernizr
+dependencies[] = site_map
+dependencies[] = panels_extra_styles
+dependencies[] = tb_megamenu
+dependencies[] = workbench_moderation
+dependencies[] = scheduler
+dependencies[] = conditional_fields
+dependencies[] = querypath
+dependencies[] = migrate
+dependencies[] = mobile_detect
+dependencies[] = menu_attributes
+dependencies[] = special_menu_items
+dependencies[] = better_exposed_filters
+dependencies[] = uuid_features
+dependencies[] = views_load_more
+dependencies[] = entityreference
+
+; custom
+dependencies[] = amberroad_main

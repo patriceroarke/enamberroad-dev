@@ -1,0 +1,41 @@
+.view-awards-teaser-list {
+  padding-bottom: 10px;
+  .views-row {
+    @include clearfix;
+    margin-bottom: 25px;
+    @include breakpoint($tab) {
+      margin-bottom: 52px;
+    }
+  }
+  .views-field-field-award-logo {
+    float: left;
+    width: 33%;
+    margin-right: 10px;
+    margin-top: 5px;
+    @include breakpoint($tab) {
+      width: 20.5%;
+      margin-right: 14px;
+    }
+    img {
+      border: 1px solid #c0c0c0;
+      box-sizing: content-box;
+    }
+  }
+  .field-award-group {
+    float: left;
+    padding: 1px;
+    width: 60%;
+    @include breakpoint($tab) {
+      width: 73%;
+    }
+    .view-field-body {
+      line-height: 19px;
+      p {
+        margin-top: 1px;
+      }
+    }
+    .view-field-title {
+      color: $flamingo;
+    }
+  }
+}

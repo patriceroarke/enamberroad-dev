@@ -1,0 +1,42 @@
+.page-search {
+  .search-form {
+    padding-top: 20px;
+  }
+  main {
+    margin-bottom: 50px;
+    padding-left: 15px;
+    padding-right: 15px;
+    @include breakpoint($tab) {
+      padding-left: 40px;
+      padding-right: 60px;
+    }
+    .search-result-count {
+      color: $orange-roughy;
+      font-size: 13px;
+      margin-bottom: 15px;
+      margin-top: 20px;
+    }
+    .search-results {
+      padding-left: 0;
+      .title {
+        font-size: convert(11, pts, px);
+        margin-bottom: 0;
+      }
+      p {
+        @include breakpoint(max-width $mobile-max) {
+          word-wrap: break-word;
+        }
+      }
+    }
+    .search-snippet-info {
+      padding-left: 0;
+    }
+    .search-result {
+      margin-bottom: 18px;
+    }
+  }
+  .pager {
+    margin-top: 28px;
+    padding-left: 0;
+  }
+}

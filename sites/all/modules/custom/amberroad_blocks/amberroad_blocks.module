@@ -1,0 +1,241 @@
+<?php
+/**
+ * @file
+ * Code for the Blocks feature.
+ */
+
+/**
+ * Implement hook_menu().
+ */
+function amberroad_blocks_menu() {
+  $items['admin/config/amberroad'] = array(
+    'title' => 'Amberroad Configuration',
+    'description' => 'Manage custom configuration.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('amberroad_blocks_configuration'),
+    'access arguments' => array('administer amberroad custom settings'),
+    'file' => 'amberroad_blocks.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function amberroad_blocks_permission() {
+  return array(
+    'administer amberroad custom settings' => array(
+      'title' => t('Administer amberroad custom settings'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function amberroad_blocks_block_info() {
+  $blocks = array();
+
+  $blocks['footer_social_links_left'] = array(
+    'info' => t('Left Social Icons'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['footer_social_links_right'] = array(
+    'info' => t('Right Social Icons'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['footer_copyright'] = array(
+    'info' => t('Copyright'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['homepage_featured'] = array(
+    'info' => t('Homepage Featured'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['footer_social_links_mobile'] = array(
+    'info' => t('Mobile block'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['header_language_switch_flags'] = array(
+    'info' => t('Language switcher'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['homepage_promo_text'] = array(
+    'info' => t('Homepage Promo Text'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['client_logo_rotator'] = array(
+    'info' => t('Client Logo Rotator'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['podcast_audio'] = array(
+    'info' => t('Podcast Audio'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['resource_banner'] = array(
+    'info' => t('Resource Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['event_banner'] = array(
+    'info' => t('Event Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['industry_conference_banner'] = array(
+    'info' => t('Industry Conference Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['seminar_banner'] = array(
+    'info' => t('Seminar Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['webinar_banner'] = array(
+    'info' => t('Webinar Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['user_conference_banner'] = array(
+    'info' => t('User Conference Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['testimonial_banner'] = array(
+    'info' => t('Testimonial Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['career_banner'] = array(
+    'info' => t('Career Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['press_release_banner'] = array(
+    'info' => t('Press Release Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['press_release_back_link'] = array(
+    'info' => t('Back Page Link'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['press_release_interact'] = array(
+    'info' => t('Interact With Us'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['press_coverage_banner'] = array(
+    'info' => t('Press Coverage Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['awards_banner'] = array(
+    'info' => t('Awards Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['press_room_banner'] = array(
+    'info' => t('Press Room Banner'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  $blocks['how_to_apply_career'] = array(
+    'info' => t('Career How to Apply'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function amberroad_blocks_block_view($delta) {
+  $block = array();
+
+  // Automatically find the appropriate function to retrieve the block content.
+  $blocks = array_keys(amberroad_blocks_block_info());
+  if (in_array($delta, $blocks)) {
+    module_load_include('inc', 'amberroad_blocks', 'amberroad_blocks.block');
+    $banner = amberroad_blocks_banners($delta);
+
+    // Generate banner according to block name.
+    if (!empty($banner)) {
+      $block = amberroad_blocks_banner_block_view($delta, $banner);
+    }
+    else {
+      $function = 'amberroad_blocks_' . $delta . '_block_view';
+      $block = $function();
+    }
+
+  }
+
+  return $block;
+}
+
+
+/**
+ * Implements hook_block_view_alter().
+ */
+function amberroad_blocks_block_view_alter(&$data, $block) {
+
+  if($block->module == 'aggregator'){
+    $delta = $block->delta;
+    if (user_access('access news feeds')) {
+      $block = array();
+      list($type, $id) = explode('-', $delta);
+      $result = FALSE;
+      switch ($type) {
+        case 'feed':
+          if ($feed = db_query('SELECT fid, title, block FROM {aggregator_feed} WHERE block <> 0 AND fid = :fid', array(':fid' => $id))->fetchObject()) {
+            $block['subject'] = check_plain($feed->title);
+            $result = db_query_range("SELECT * FROM {aggregator_item} WHERE fid = :fid ORDER BY timestamp DESC, iid DESC", 0, $feed->block, array(':fid' => $id));
+            $read_more = '<div class="more-link">' . l(t('Read More'), '/content/blogs', array('attributes' => array('title' => t("View recent blog posts.")))) . '</div>';
+          }
+          break;
+
+        case 'category':
+          if ($category = db_query('SELECT cid, title, block FROM {aggregator_category} WHERE cid = :cid', array(':cid' => $id))->fetchObject()) {
+            $block['subject'] = check_plain($category->title);
+            $result = db_query_range('SELECT i.* FROM {aggregator_category_item} ci LEFT JOIN {aggregator_item} i ON ci.iid = i.iid WHERE ci.cid = :cid ORDER BY i.timestamp DESC, i.iid DESC', 0, $category->block, array(':cid' => $category->cid));
+            $read_more = theme('more_link', array('url' => 'aggregator/categories/' . $category->cid, 'title' => t("View this category's recent news.")));
+          }
+          break;
+      }
+
+      $items = array();
+      if (!empty($result)) {
+        foreach ($result as $item) {
+          //$items[] = theme('aggregator_block_item', array('item' => $item));
+          $items[] = '<a href="' . check_url($item->link) . '" target="_new">' . check_plain($item->title) . "</a>\n";
+          }
+      }
+
+      // Only display the block if there are items to show.
+      if (count($items) > 0) {
+        $block['content'] = theme('item_list', array('items' => $items)) . $read_more;
+      }
+      $data['content'] = $block['content'];
+    }
+  }
+}
+
+/**
+ * Technical function to perform a query to insert a new block.
+ */
+function _amberroad_blocks_install_blocks($blocks) {
+  $query = db_insert('block')->fields(array(
+    'module',
+    'delta',
+    'theme',
+    'status',
+    'weight',
+    'region',
+    'pages',
+    'cache',
+    'visibility',
+  ));
+  foreach ($blocks as $block) {
+    $query->values($block);
+  }
+  $query->execute();
+}
+
+/**
+ * Implemenets hook_form_FORM_ID_alter().
+ *
+ * Add placeholder to search form block.
+ */
+function amberroad_blocks_form_search_block_form_alter(&$form, &$form_state) {
+  $form['actions']['submit'] = array('#type' => 'image_button', '#src' => drupal_get_path('module', 'amberroad_blocks') . '/img/magnify.png');
+  $form['search_block_form']['#attributes']['placeholder'] = t('Search');
+}

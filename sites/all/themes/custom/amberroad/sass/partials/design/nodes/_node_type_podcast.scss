@@ -1,0 +1,80 @@
+.node-type-podcast {
+  .block-menu {
+    .menu li.last.leaf:after {
+      color: transparent !important;
+    }
+  }
+
+  .panels-generic-content-main {
+    background-color: white;
+  }
+  .panels-generic-content-main-inside {
+    float: left;
+    max-width: 949px;
+    margin-top: 43px;
+    .pane-node-field-podcast-author-image {
+      @include breakpoint($tab) {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      &.width_image {
+        @include breakpoint($tab $tab-max) {
+          width: 30%;
+        }
+        @include breakpoint($tab-wide) {
+          padding-left: 5px;
+        }
+      }
+      .field-item {
+        display: inline-block;
+      }
+    }
+    .field-name-field-podcast-author-image {
+      text-align: center;
+    }
+  }
+  .podcast_node_detail {
+    padding-left: 15px;
+    @include breakpoint($tab) {
+      display: inline-block;
+      width: 72%;
+      &.width_detail {
+        width: 56%;
+      }
+    }
+    h1 {
+      font-weight: 700;
+      font-size: convert(13, pts, px);
+      font-variant: normal;
+      margin: 0;
+      line-height: 22px;
+    }
+    .pane-node-field-podcast-presented-by {
+      .field-label {
+        display: none;
+      }
+    }
+    .pane-node-body p {
+      margin-top: 8px;
+    }
+    .field-name-field-podcast-mp3 {
+      margin-bottom: 90px;
+      margin-top: 45px;
+      text-align: center;
+      .file img {
+        display: none;
+      }
+      a {
+        display: inline-block;
+        font-size: 0;
+        padding: 1px 1px 38px;
+        background-image: url("../images/listen_now.gif");
+        background-repeat: no-repeat;
+        background-position: center center;
+        height: 62px;
+        width: 170px;
+      }
+    }
+  }
+}

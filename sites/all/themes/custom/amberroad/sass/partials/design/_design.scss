@@ -1,0 +1,52 @@
+////////////////////////
+// Design Partials
+//
+// Separate your Layout from Design
+// Build sub folders and partials in this folder, with everything being imported, in cascading order, into this file.
+//
+// All styling, non box model properties go here
+////////////////////////
+
+@import 'btn';
+@import 'regions/footer';
+@import 'blocks/footer_menu_blocks';
+@import 'regions/header';
+@import 'blocks/header_blocks';
+@import 'blocks/mega_menu';
+@import 'pages/home';
+@import 'views/view_homepage_slideshow';
+@import 'panes/promo_text';
+@import 'panes/client_logo_rotator';
+@import 'panes/homepage_featured_block';
+@import 'panes/pane_homepage_blocks';
+@import 'panes/pane_banner';
+@import 'pages/not_front';
+@import 'pages/page_taxonomy_term';
+@import 'panes/pane_view_teaser_listing';
+@import 'views/view_teaser_listing';
+@import 'nodes/node_type_podcast';
+@import 'nodes/node_type_page';
+@import 'panes/related_blogs';
+@import 'nodes/node_type_solution_area';
+@import 'panes/news_ticker';
+@import 'views/view_industry_conferences';
+@import 'views/view_seminars_webinars';
+@import 'pages/page_taxonomy_term_careers';
+@import 'views/view_all_careers';
+@import 'nodes/node_type_testimonial';
+@import 'panes/pane_testimonials_list_block';
+@import 'panes/pane_testimonial_detail_block';
+@import 'pages/page_press_releases';
+@import 'nodes/node_type_press_release';
+@import 'pages/page_press';
+@import 'pages/page_awards';
+@import 'views/view_awards_teaser_list';
+@import 'pages/page_press_coverage';
+@import 'panes/pane_banner_menu';
+@import 'pages/sitemap';
+@import 'pages/page_user';
+@import 'pages/page_search';
+@import 'pages/page_basic_solution_area';
+@import 'pages/page_resources_search';
+@import 'views/view_resource_library_search';
+@import 'panes/pane_resource_library_filters';

@@ -1,0 +1,25 @@
+name = "Amberroad Main"
+description = "Provides main and common functionalities."
+core = 7.x
+package = "Amberroad"
+
+; Dependencies
+dependencies[] = amberroad_taxonomy
+dependencies[] = amberroad_field_base
+dependencies[] = amberroad_slideshow
+dependencies[] = amberroad_homepage
+dependencies[] = amberroad_blocks
+dependencies[] = amberroad_events
+dependencies[] = amberroad_podcast
+dependencies[] = amberroad_basic_page
+dependencies[] = amberroad_resources
+dependencies[] = amberroad_testimonial
+dependencies[] = amberroad_solution_area
+dependencies[] = amberroad_pages
+dependencies[] = amberroad_careers
+dependencies[] = amberroad_press_release
+dependencies[] = amberroad_press_coverage
+dependencies[] = amberroad_awards
+dependencies[] = amberroad_settings
+dependencies[] = amberroad_migrate
+

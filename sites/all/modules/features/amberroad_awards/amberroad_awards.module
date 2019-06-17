@@ -1,0 +1,44 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Awards feature.
+ */
+
+include_once 'amberroad_awards.features.inc';
+
+/**
+ * Implements hook_events_views_pre_render().
+ */
+function amberroad_awards_views_pre_render(&$view) {
+  // Add external link to awards logo.
+  if ($view->name == 'awards') {
+    $result = $view->result;
+    foreach ($result as $row) {
+      if (isset($row->field_field_award_logo)) {
+        $row->field_field_award_logo[0]['rendered']['#path']['path'] = $row->field_field_external_link[0]['raw']['url'];
+      }
+    }
+  }
+}
+
+/**
+ * Create menu items for Awards type under Press Room menu item.
+ */
+function amberroad_awards_create_menu_items() {
+  $mlid = amberroad_main_mlid_load('amberroad-main-menu', 'Press Room');
+
+  $items = array(
+    array(
+      'link_path' => 'html/awards.shtml',
+      'link_title' => 'Awards',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 0,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+  );
+
+  foreach ($items as $item) {
+    menu_link_save($item);
+  }
+}

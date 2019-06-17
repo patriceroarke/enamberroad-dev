@@ -1,0 +1,45 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Press Coverage feature.
+ */
+
+include_once 'amberroad_press_coverage.features.inc';
+
+/**
+ * Implements hook_events_views_pre_render().
+ */
+function amberroad_press_coverage_views_pre_render(&$view) {
+  // Add external link to event logo.
+  if ($view->name == 'press_coverage') {
+    $result = $view->result;
+    foreach ($result as $row) {
+      if (isset($row->field_field_event_logo)) {
+        $row->field_field_event_logo[0]['rendered']['#path']['path'] = $row->field_field_external_link[0]['raw']['url'];
+      }
+    }
+  }
+}
+
+/**
+ * Create menu items for Press Coverage type under COMPANY menu item.
+ */
+function amberroad_press_coverage_create_menu_items() {
+  $mlid = amberroad_main_mlid_load('amberroad-main-menu', 'Press Room');
+
+  $items = array(
+    array(
+      'link_path' => 'html/press_coverage.shtml',
+      'link_title' => 'Press Coverage',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 1,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+  );
+
+  foreach ($items as $item) {
+    menu_link_save($item);
+  }
+
+}

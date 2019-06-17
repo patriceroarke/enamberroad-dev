@@ -1,0 +1,37 @@
+.page-sitemap {
+  .site-map-box-front .content {
+    em {
+      font-style: normal;
+    }
+    a:hover {
+      color: $grey-shade-2;
+    }
+  }
+  .site-map-box-menu-amberroad-main-menu .content > .site-map-menu > li > a {
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+}
+
+#site-map {
+  padding: 20px 15px 40px 15px;
+  @include breakpoint($tab) {
+    padding-left: 40px;
+    padding-right: 20px
+  }
+  h2.title {
+    font-size: 20px;
+  }
+  ul li {
+    cursor: pointer;
+    &.leaf {
+      list-style-image: url("../images/bullet-black.png");
+      a:hover {
+        text-decoration: none;
+      }
+    }
+    a:hover {
+      color: $grey-shade-2;
+    }
+  }
+}

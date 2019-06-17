@@ -1,0 +1,54 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Careers feature.
+ */
+
+include_once 'amberroad_careers.features.inc';
+
+/**
+ * Create menu items for Career under COMPANY menu item.
+ */
+function amberroad_careers_create_menu_items() {
+  $mlid = amberroad_main_mlid_load('amberroad-main-menu', 'Careers');
+
+  $items = array(
+    array(
+      'link_path' => drupal_get_normal_path('html/careers_ap.shtml'),
+      'link_title' => 'Asia Pacific',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 0,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+    array(
+      'link_path' => drupal_get_normal_path('html/careers_eu.shtml'),
+      'link_title' => 'Europe',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 1,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+    array(
+      'link_path' => drupal_get_normal_path('html/careers_ind.shtml'),
+      'link_title' => 'India',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 2,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+    array(
+      'link_path' => drupal_get_normal_path('html/careers_us.shtml'),
+      'link_title' => 'US',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 3,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+  );
+
+  foreach ($items as $item) {
+    menu_link_save($item);
+  }
+
+}

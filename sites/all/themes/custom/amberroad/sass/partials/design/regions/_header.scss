@@ -1,0 +1,76 @@
+#logo {
+  @include breakpoint(max-width $mobile-max) {
+    width: 46%;
+  }
+  @include layout-at(12, $tab) {
+    @include grid-span(3,1, $output-style: 'isolation');
+  }
+}
+
+#block-menu-menu-header {
+  float: left;
+  margin-right: 5px;
+  margin-top: 6px;
+  width: 38%;
+  @include breakpoint(max-width $mobile-max) {
+    line-height: 12px;
+  }
+  @include layout-at(12, $tab) {
+    @include grid-span(6,4, $output-style: 'isolation');
+    
+    margin-top: 0;
+  }
+  @include breakpoint($desk) {
+    margin-left: 25.8%;
+  }
+}
+
+#block-search-form {
+  float: right;
+  margin-bottom: 8px;
+  margin-top: 6px;
+  @include layout-at(12, $tab) {
+    @include grid-span(6,4, $output-style: 'isolation');
+    margin-top: 30px;
+    margin-left: 30.5%;
+    text-align: center;
+  }
+}
+
+#block-amberroad-blocks-header-language-switch-flags {
+  clear: both;
+  margin: 1px 16px 2px 0;
+  float: right;
+  @include layout-at(12, $tab) {
+    @include grid-span(3,10, $output-style: 'isolation');
+    margin: 3px 7px 0 0;
+    clear: none;
+  }
+}
+
+.logged-in {
+  #block-amberroad-blocks-header-language-switch-flags {
+    @include breakpoint($tab) {
+      margin-top: 5px;
+    }
+  }
+  #block-menu-menu-header {
+    @include breakpoint($tab) {
+      margin-top: 2px;
+    }
+  }
+  #admin-menu {
+    box-shadow: none;
+  }
+  #admin-menu-wrapper a {
+    font-size: 11px;
+  }
+  #admin-menu-menu .admin-menu-toolbar-category {
+    @include breakpoint(max-width 979px) {
+      display: none;
+      &:first-child {
+        display: block;
+      }
+    }
+  }
+}

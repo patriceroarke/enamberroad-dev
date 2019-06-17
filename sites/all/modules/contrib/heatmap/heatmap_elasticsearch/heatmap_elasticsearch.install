@@ -1,0 +1,29 @@
+<?php
+
+
+/**
+ * Uninstall hook for HeatMap Elasticsearch module.
+ */
+function heatmap_elasticsearch_uninstall() {
+  $error = false;
+  if(module_load_include('module', 'elasticsearch_connector')) {
+    if(variable_get('heatmap_elasticsearch_cluster', '') == '') {
+      $error = true;
+    } else {
+      $client = elasticsearch_connector_get_client_by_id(variable_get('heatmap_elasticsearch_cluster', ''));
+      if($client) {
+        $client->indices()->delete(array('index' => 'drupal_heatmap'));
+      } else {
+        $error = true;
+      }
+    }
+  } else {
+    $error = true;
+  }
+  
+  if ($error) {
+    drupal_set_message(t('We were not able to remove the Elasticsearch index on uninstall, please do this your self'), 'error');
+  }
+  
+  variable_del('heatmap_elasticsearch_cluster');
+}

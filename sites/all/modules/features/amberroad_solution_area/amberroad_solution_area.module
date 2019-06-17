@@ -1,0 +1,135 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Solution Area feature.
+ */
+
+include_once 'amberroad_solution_area.features.inc';
+/**
+ * Act on a field collection item that is being assembled before rendering.
+ *
+ * @param $field_collection_item
+ *   The field collection item entity.
+ * @param $view_mode
+ *   The view mode the field collection item is rendered in.
+ * @param $langcode
+ *   The language code used for rendering.
+ *
+ * The module may add elements to $field_collection_item->content prior to
+ * rendering. The structure of $field_collection_item->content is a renderable
+ * array as expected by drupal_render().
+ *
+ * @see hook_entity_prepare_view()
+ * @see hook_entity_view()
+ */
+function amberroad_solution_area_field_collection_item_view($field_collection_item, $view_mode, $langcode) {
+  $field_collection = $field_collection_item->wrapper();
+  $bundle = $field_collection->getBundle();
+
+  if ($view_mode == 'full' && $bundle == 'field_rhs_ad_blocks') {
+
+    $image = $field_collection_item->content['field_ad_image'];
+    $url = '';
+    if(isset($field_collection_item->content['field_ad_link']['#items'][0]['url'])){
+      $url = $field_collection_item->content['field_ad_link']['#items'][0]['url'];
+    }
+    $new_window = '';
+    if(isset($field_collection_item->content['field_ad_new_window']['#items'][0]['value'])){
+      $new_window = $field_collection_item->content['field_ad_new_window']['#items'][0]['value'];
+    }
+    unset($field_collection_item->content['field_ad_link']);
+    unset($field_collection_item->content['field_ad_image']);
+    unset($field_collection_item->content['field_ad_new_window']);
+    $field_collection_item->content['field_ad_image'] = array(
+      '#image' => render($image),
+      '#url' => $url,
+      '#theme' => 'amberroad_solution_area_ad_image',
+      '#new_window' => $new_window,
+    );
+  }
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function amberroad_solution_area_theme($existing, $type, $theme, $path) {
+  return array(
+    'amberroad_solution_area_ad_image' => array(
+      'variables' => array('image' => NULL, 'url' => NULL, 'new_window' => NULL),
+    )
+  );
+}
+
+/**
+ * Theme function to render field collection items.
+ */
+function theme_amberroad_solution_area_ad_image (&$variable) {
+  if ($variable['url'] != "") {
+    $arr = array();
+    if($variable['new_window'] == 1){
+      $arr = array('target' => '_blank');
+    }
+    return l($variable['image'], $variable['url'], array('html' => TRUE, 'attributes' => $arr));
+  }
+  else {
+    return $variable['image'];
+  }
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function amberroad_solution_area_entity_info_alter(&$entity_info) {
+  $entity_info['node']['view modes']['related_contents'] = array(
+    'label' => t('Related contents'),
+    'custom settings' => TRUE,
+  );
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+function amberroad_solution_area_preprocess_field(&$variables) {
+  if ($variables['element']['#field_name'] == 'field_related_blog_post') {
+    $blog_url = $variables['items'][0]['#markup'];
+    $variables['items'][0]['#markup'] = '<div class="blogs-link"><h1><a class="btmlink" href="http://blog.amberroad.com/blog" target="_blank">Related Blog Posts</a></h1></div><script language="JavaScript" src="' . $blog_url . '" charset="UTF-8" type="text/javascript"></script><div class="read_more_blogs"><a class="btmlink" href="http://www.amberroad.com/html/rl_blogs.shtml" target="_blank">Check out our blogs for more global trade insights</a></div>';
+  }
+  if ($variables['element']['#field_name'] == 'field_banner_menu_details') {
+    $content = $variables['items'][0]['#markup'];
+    $content = explode('|', $content);
+    $current_path = drupal_get_path_alias();
+    $current_path = explode('/', $current_path);
+    global $base_url;
+
+    // Attach js file according to device.
+    $detect = mobile_detect_get_object();
+    $is_mobile = $detect->isMobile();
+    $is_tablet = $detect->isTablet();
+
+    $variables['items'][0]['#markup'] = '<div id="Stage" class="EDGE-' . $content[0] . '"></div>';
+    if ($is_tablet) {
+      if (strpos($current_path[0], 'enterprise') !== FALSE) {
+        drupal_add_js($base_url . "/" . $current_path[0] . '/enterprise tablet ' . $content[1], 'file');
+      }
+      elseif (strpos($current_path[0], 'global-knowledge') !== FALSE) {
+        $content[1] = str_replace('GK_hero-', 'gk_tablet_', $content[1]);
+        drupal_add_js($base_url . "/" . $current_path[0] . '/' . $content[1], 'file');
+        $variables['items'][0]['#markup'] = '<div id="Stage" class="EDGE-250623195"></div>';
+      }
+    }
+    elseif ($is_mobile) {
+      if (strpos($current_path[0], 'enterprise') !== FALSE) {
+        drupal_add_js($base_url . "/" . $current_path[0] . '/enterprise tablet ' . $content[1], 'file');
+        //$variables['items'][0]['#markup'] = '<div id="Stage" class="EDGE-148164628"></div>';
+      }
+      elseif (strpos($current_path[0], 'global-knowledge') !== FALSE) {
+        $content[1] = str_replace('GK_hero-', 'gk_mobile_', $content[1]);
+        drupal_add_js($base_url . "/" . $current_path[0] . '/' . $content[1], 'file');
+        $variables['items'][0]['#markup'] = '<div id="Stage" class="EDGE-250623195"></div>';
+      }
+    }
+    else {
+      drupal_add_js($base_url . "/" . $current_path[0] . '/' . $content[1], 'file');
+    }
+  }
+}

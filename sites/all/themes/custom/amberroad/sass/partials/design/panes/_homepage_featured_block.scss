@@ -1,0 +1,53 @@
+%homepage-block-pane-title {
+  color: $bamboo;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: bold;
+  padding-left: 15px;
+}
+
+%homepage-block-pane-content {
+  box-shadow: 6px 6px 4px #bebebe;
+  width: 97.2%;
+  height: auto;
+  @include breakpoint($tab) {
+    height: 230px;
+    max-height: 230px;
+  }
+}
+
+.pane-views.pane-homepage-blocks, .pane-amberroad-blocks-homepage-featured {
+  h2.pane-title {
+    @extend %homepage-block-pane-title;
+  }
+  .pane-content {
+    @extend %homepage-block-pane-content;
+  }
+  .homepage_featured img {
+    @include breakpoint(max-width $mobile-max) {
+      width: 100%;
+    }
+  }
+}
+
+.pane-homepage-featured-block {
+  @extend .pane-amberroad-blocks-homepage-featured;
+  .pane-title {
+    display: none;
+  }
+  .pane-content {
+    height: inherit;
+    box-shadow: none;
+
+    .view-homepage-featured-block {
+      .views-field-title {
+        @extend %homepage-block-pane-title;
+        margin: 11px 0;
+      }
+      .views-field-field-block-image {
+        @extend %homepage-block-pane-content;
+        padding-left: 15px;
+      }
+    }
+  }
+}

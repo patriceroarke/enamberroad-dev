@@ -1,0 +1,65 @@
+.view-display-id-panel_webinar, .view-display-id-panel_seminar {
+  margin-top: 24px;
+  padding-right: 9px;
+  @include breakpoint($tab) {
+    padding-left: 5px;
+    padding-right: 20px;
+  }
+	.views-row {
+    display: table;
+    .views-field-field-event-logo {
+      text-align: center;
+      @include breakpoint($tab) {
+        display: table-cell;
+        vertical-align: top;
+        width: 247px;
+      }
+      img {
+        border: 1px solid black;
+        @include breakpoint($tab) {
+          display: block;
+        }
+      }
+    }
+    .views-field {
+      line-height: 20px;
+    }
+    .views-field-title {
+      @include breakpoint(max-width $mobile-max) {
+        margin-top: 18px;
+      }
+      font-weight: bold;
+      a:visited {
+        color: $flamingo;
+      }
+    }
+    .views-field-body, p {
+      margin-top: 18px;
+      margin-bottom: 18px;
+    }
+  }
+}
+
+.view-display-id-panel_seminar {
+  .views-row {
+    margin-bottom: 25px;
+    @include breakpoint($tab) {
+      margin-bottom: 45px;
+    }
+  }
+}
+
+.view-display-id-panel_webinar {
+  .views-row {
+    margin-bottom: 25px;
+    @include breakpoint($tab) {
+      margin-bottom: 60px;
+    }
+  }
+  .views-field-field-event-hosted-by {
+    font-style: italic;
+  }
+  .views-field-field-event-date-and-time {
+    margin-top: 3px;
+  }
+}

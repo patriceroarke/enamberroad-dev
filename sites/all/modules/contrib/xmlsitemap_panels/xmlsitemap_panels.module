@@ -1,0 +1,149 @@
+<?php
+
+/**
+ * Implementation of hook_permission().
+ */
+function xmlsitemap_panels_permission() {
+  return array(
+    'manage page_manager xmlsitemap_panels' => array(
+      'title' => t('Administer Page Manage Page Aliases'), 
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_page_manager_variant_operations_alter().
+ *
+ * Adds a custom administrative interface per variant for adding 
+ * panel pages to xmlsitemaps.
+ */
+function xmlsitemap_panels_page_manager_variant_operations_alter(&$operations, &$handler) {
+  if ($handler->task == 'page' && user_access('manage page_manager xmlsitemap_panels')) {
+    $keys = array_keys($operations['children']);
+    $before = array_slice($operations['children'], 0, array_search('settings', $keys) +1);
+    $after = array_slice($operations['children'], array_search('settings', $keys) + 1);
+    $xmlsitemap = array(
+      'xmlsitemap' => array (
+        'title' => t('XML sitemap'),
+        'description' => t('Allow a given variant to provide a xmlsitemap.'),
+        'form' => 'xmlsitemap_panels_subtask_form',
+      ),
+    );
+    $operations['children'] = array_merge($before, $xmlsitemap, $after);
+  }
+}
+
+/**
+ * Form callback for the administrative interface to add path aliases.
+ */
+function xmlsitemap_panels_subtask_form($form, $form_state) {
+  module_load_include('inc', 'xmlsitemap', 'xmlsitemap.admin');
+  $conf = $form_state['handler']->conf;
+  $form['settings']['xmlsitemap_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable XML sitemap.'),
+    '#default_value' => isset($conf['xmlsitemap_enabled']) ? $conf['xmlsitemap_enabled'] : FALSE,
+  );
+  $form['xmlsitemap'] = array(
+    '#title' => t('Settings'),
+    '#type' => 'fieldset',
+    '#states' => array(
+      'visible' => array(
+        ':input[name="xmlsitemap_enabled"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+  $form['xmlsitemap']['priority'] = array(
+    '#type' => 'select',
+    '#title' => t('Priority'),
+    '#options' => xmlsitemap_get_priority_options(),
+    '#default_value' => number_format($conf['priority'], 1),
+    '#description' => t('The priority of this URL relative to other URLs on your site.'),
+  );
+  $form['xmlsitemap']['changefreq'] = array(
+    '#type' => 'select',
+    '#title' => t('Change frequency'),
+    '#options' => array(0 => t('None')) + xmlsitemap_get_changefreq_options(),
+    '#default_value' => $conf['changefreq'],
+    '#description' => t('How frequently the page is likely to change. This value provides general information to search engines and may not correlate exactly to how often they crawl the page.'),
+  );
+  $languages = module_exists('locale') ? locale_language_list() : array();
+  $form['xmlsitemap']['language'] = array(
+    '#type' => 'select',
+    '#title' => t('Language'),
+    '#default_value' => $conf['language'],
+    '#options' => array(LANGUAGE_NONE => t('Language neutral')) + $languages,
+    '#access' => $languages,
+  );
+  return $form;
+}
+
+/**
+ * Form validation callback.
+ */
+function xmlsitemap_panels_subtask_form_validate(&$form, &$form_state) {
+}
+
+/**
+ * Form submit callback.
+ */
+function xmlsitemap_panels_subtask_form_submit($form, &$form_state) {
+  $form_state['handler']->conf['xmlsitemap_enabled'] = $form_state['values']['xmlsitemap_enabled'];
+  $form_state['handler']->conf['priority'] = $form_state['values']['priority'];
+  $form_state['handler']->conf['changefreq'] = $form_state['values']['changefreq'];
+  $form_state['handler']->conf['language'] = $form_state['values']['language'];
+}
+
+/**
+ * Since page_manager pages can be very convoluted and don't necessarily
+ * require an entity as an argument, determining all aliases for a page can be
+ * quite complex. This alter will populate xml sitemap as pages are visited as a
+ *
+ */
+function xmlsitemap_panels_ctools_render_alter($info, $page, $context) {
+  $path = request_path(); 
+  $conf = $context['handler']->conf;
+  if (empty($conf['xmlsitemap_enabled']) || _xmlsitemap_panels_check($path)) {
+    return;
+  }
+  $link = array(
+      'id' => db_query("SELECT MAX(id) FROM {xmlsitemap} WHERE type = 'panel'")->fetchField() + 1,
+      'loc' => request_path(),
+      'priority' => $conf['priority'],
+      'lastmod' => 0,
+      'changefreq' => $conf['changefreq'],
+      'changecount' => 0,
+      'language' => $conf['language'],
+      'type' => 'panel',
+    );
+  xmlsitemap_link_save($link);
+}
+
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function xmlsitemap_panels_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'xmlsitemap_panels') {
+    return 'plugins/' . $plugin_type;
+  }
+}
+
+/**
+ * Implementation of hook_ctools_plugin_type().
+ */
+function xmlsitemap_panels_ctools_plugin_type() {
+  return array(
+    'context_indexes' => array(
+      'child plugins' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Check if url already in xmlsitemap table.
+ */
+function _xmlsitemap_panels_check($loc) {
+  $result = db_query("SELECT id FROM {xmlsitemap} WHERE loc = :loc", array(':loc' => $loc));
+  return $result->fetchAssoc();
+}

@@ -1,0 +1,55 @@
+.node-type-press-release {
+  .panels-amber-content-layout {
+    padding-bottom: 35px;
+  }
+  .pane-page-breadcrumb {
+    margin-bottom: 12px;
+  }
+  .pane-node-field-press-release-date {
+    float: left;
+    @include breakpoint($tab) {
+      width: 58%;
+    }
+  }
+  .pane-amberroad-blocks-press-release-back-link {
+    float: left;
+    padding-left: 12%;
+    @include breakpoint($tab) {
+      padding-left: 12px;
+    }
+  }
+  .pane-node-body {
+    clear: both;
+    float: left;
+    margin-top: 30px;
+    line-height: 20px;
+    table {
+      max-width: 874px;
+      width: 100% !important;
+      border-collapse: separate;
+    }
+    td {
+      vertical-align: top;
+      padding-right: 2px;
+      padding-top: 2px;
+    }
+    ul {
+      padding-left: 12px;
+    }
+    li {
+      list-style-image: url("../images/bullet-black.png");
+    }
+    p {
+      margin-top: 13px;
+      margin-bottom: 13px;
+    }
+  }
+  .field-name-body {
+    max-width: 894px;
+    padding-right: 12px;
+    width: 100%;
+    @include breakpoint($tab) {
+      padding-right: 20px;
+    }
+  }
+}

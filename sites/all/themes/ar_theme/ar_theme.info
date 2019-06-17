@@ -1,0 +1,48 @@
+name        = New Amberroad
+description = A theme based on Radix.
+screenshot  = screenshot.png
+core        = 7.x
+
+; Base - Radix
+base theme  = radix
+
+
+; Regions
+regions[content] = Content
+regions[footer] = Footer
+
+; Breakpoints
+breakpoints[xs] = (max-width: 767px)
+breakpoints[sm] = (min-width: 768px) and (max-width: 991px)
+breakpoints[md] = (min-width: 992px) and (max-width: 1199px)
+breakpoints[lg] = (min-width: 1200px)
+
+; Panels
+plugins[panels][layouts] = panels/layouts
+plugins[panels][styles] = panels/styles
+
+; CSS - General
+stylesheets[all][]     = assets/css/ar_theme.style.css
+stylesheets[all][]     = assets/css/custom.css
+stylesheets[all][]     = assets/css/custom2.css
+stylesheets[all][]     = assets/css/animate.css
+stylesheets[all][]     = assets/css/bootstrap.min.css
+stylesheets[all][]     = assets/css/slick.min.css
+stylesheets[all][]     = assets/css/slick-theme.min.css
+stylesheets[all][]     = assets/css/rke.css
+
+;stylesheets[all][]     = assets/css/animate.css
+;stylesheets[all][]     = /assets/css/bootstrap.min.css
+
+; Javascript
+scripts[] = assets/js/ar_theme.script.js
+scripts[] = assets/js/imageMapResizer.min.js
+scripts[] = assets/js/munchkin.js
+scripts[] = assets/js/lazysizes.min.js
+scripts[] = assets/js/slick.min.js
+
+; Information added by Drupal.org packaging script on 2016-01-28
+version = "7.x-3.2"
+core = "7.x"
+project = "radix"
+datestamp = "1453978445"

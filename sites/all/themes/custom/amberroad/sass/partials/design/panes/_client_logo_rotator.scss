@@ -1,0 +1,29 @@
+.pane-amberroad-blocks-client-logo-rotator {
+  min-height: 40px;
+  #rotating-item-wrapperw {
+    position: relative;
+  }
+  .rotating-items {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+
+.client-banner-image .field-type-image {
+  .field-items {
+    margin-left: 8px;
+    text-align: center;
+
+    .field-item {
+      display: inline-block;
+      padding: 0 12px;
+
+      img {
+        max-width: 140px;
+        max-height: 39px;
+      }
+    }
+  }
+}

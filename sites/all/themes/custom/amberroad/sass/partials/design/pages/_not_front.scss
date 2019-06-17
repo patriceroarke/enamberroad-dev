@@ -1,0 +1,56 @@
+.not-front {
+  .panels-generic-content-main-inside {
+    padding-left: 15px;
+    background-color: white;
+    @include breakpoint($tab) {
+      padding-left: 35px;
+    }
+    .pane-page-title h1 {
+      margin-bottom: 1px;
+      margin-top: 35px;
+    }
+    .pane-page-breadcrumb {
+      .breadcrumb {
+        font-size: convert(10, pts, px);
+        font-variant: small-caps;
+        padding-bottom: 1em;
+        a {
+          color: $flamingo;
+          font-size: convert(10, pts, px);
+          text-transform: capitalize;
+        }
+      }
+    }
+  }
+  .press_release-interact {
+    display: inline-block;
+    object, embed {
+      max-width: 235px;
+      width: 100%;
+    }
+  }
+}
+
+.pager {
+  margin-bottom: 25px;
+  text-align: center;
+  li {
+    display: inline-block;
+    padding-right: 6px;
+  }
+}
+
+main .content > article {
+  padding: 20px 15px 40px 15px;
+  @include breakpoint($tab) {
+    padding-left: 40px;
+    padding-right: 20px;
+  }
+  a {
+    word-wrap: break-word;
+  }
+}
+
+#magic-development {
+  display: none;
+}

@@ -1,0 +1,80 @@
+// Desktop View
+
+.pane-news-ticker-desktop-view {
+  display: none;
+  @include breakpoint($tab) {
+    display: block;
+  }
+  h2.pane-title {
+    display: inline-block;
+    font-size: convert(10, pts, px);
+    font-weight: bold;
+    margin-top: 14px;
+    padding-left: 21px;
+    padding-right: 12px;
+    text-transform: uppercase;
+  }
+  .pane-content {
+    display: inline-block;
+    vertical-align: middle;
+    width: 70%;
+  }
+}
+
+.news-ticker-desktop-view {
+  .flexslider {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    border-radius: 0;
+    margin: 0;
+    .slides {
+      a {
+        color: #db4a25;
+        font-size: convert(10, pts, px);
+        font-weight: 700;
+        &:hover {
+          text-decoration: none;
+          color: #bdbdbd;
+        }
+      }
+      li {
+        max-height: 30px;
+        overflow: hidden;
+        margin-top: 3px;
+      }
+    }
+  }
+}
+
+// Mobile View
+
+.pane-news-ticker-mobile-view {
+  @include breakpoint($tab) {
+    display: none;
+  }
+  h2.pane-title {
+    font-size: 16px;
+    font-weight: bold;
+    font-variant: normal;
+    text-transform: uppercase;
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+}
+
+.news-ticker-mobile-view {
+  .views-row {
+    line-height: 16px;
+    margin-bottom: 14px;
+  }
+  .views-field-title {
+    a {
+      color: #db4a25;
+      font-size: 12px;
+      &:hover {
+        text-decoration: none;
+        color: #bdbdbd;
+      }
+    }
+  }
+}

@@ -1,0 +1,78 @@
+.view-resource-library-search {
+  .view-content {
+    text-align: center;
+    @include breakpoint ($tab) {
+      text-align: left;
+    }
+    .views-row {
+      display: inline-block;
+      margin-right: 10px;
+      vertical-align: top;
+      width: 45%;
+      text-align: left;
+      margin-bottom: 12px;
+      @include breakpoint ($tab) {
+        width: 31%;
+      }
+    }
+    .resource-type-icon {
+      max-width: 216px;
+      cursor: pointer;
+       img {
+        display: block;
+        width: 100%;
+      }
+    }
+    .resource-search-block {
+      border: 1px solid #bfc0c3;
+      max-width: 216px;
+      padding: 12px 12px 0;
+      a {
+        color: black;
+        display: inline-block;
+        font-weight: 700;
+        height: 56px;
+        line-height: 18.5px;
+        overflow: hidden;
+        vertical-align: middle;
+        margin-bottom: 4px;
+        @include breakpoint (max-width $mobile-max) {
+          font-size: convert(10, pts, px);
+        }
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
+    .resource-search-desc {
+      border-top: 1px solid #bfc0c3;
+      padding-top: 12px;
+      margin-top: 6px;
+      .desc {
+        font-size: convert(10, pts, px);
+        line-height: 20px;
+        margin-bottom: 25px;
+      }
+    }
+    .resource-type {
+      font-size: convert(10, pts, px);
+      font-weight: bold;
+      text-transform: uppercase;
+      padding-bottom: 12px;
+    }
+  }
+  .pager-load-more {
+    margin-bottom: 30px;
+    margin-top: 30px;
+    margin-right: 25px;
+    text-align: right;
+    a {
+      display: inline-block;
+      background-image: url("../images/show-more.png");
+      background-repeat: no-repeat;
+      font-size: 0;
+      height: 39px;
+      width: 150px;
+    }
+  }
+}

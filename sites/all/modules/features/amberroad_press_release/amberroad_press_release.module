@@ -1,0 +1,53 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Press Release feature.
+ */
+
+include_once 'amberroad_press_release.features.inc';
+
+/**
+* Implements hook_date_format_types().
+*/
+function amberroad_press_release_date_format_types() {
+  return array(
+    'press_release'  => t('Press release'),
+  );
+}
+/**
+* Implements hook_date_formats().
+*/
+function amberroad_press_release_date_formats() {
+  $formats = array();
+  $formats[] = array(
+    'type'    => 'press_release',
+    'format'  => 'F d, Y',
+    'locales' => array(),
+  );
+  foreach ($formats as $format) {
+    variable_set('date_format_' . $format['type'], $format['format']);
+  }
+  return $formats;
+}
+
+/**
+ * Create menu items for press release type under Press Room menu item.
+ */
+function amberroad_press_release_create_menu_items() {
+  $mlid = amberroad_main_mlid_load('amberroad-main-menu', 'Press Room');
+
+  $items = array(
+    array(
+      'link_path' => 'html/press_releases.shtml',
+      'link_title' => 'Press Release',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 2,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+  );
+
+  foreach ($items as $item) {
+    menu_link_save($item);
+  }
+}

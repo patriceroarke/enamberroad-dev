@@ -1,0 +1,29 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Testimonial feature.
+ */
+
+include_once 'amberroad_testimonial.features.inc';
+
+/**
+ * Create menu items for testimonial type under About Us menu item.
+ */
+function amberroad_testimonial_create_menu_items() {
+  $mlid = amberroad_main_mlid_load('amberroad-main-menu', 'About Us');
+
+  $items = array(
+    array(
+      'link_path' => 'html/testimonials.shtml',
+      'link_title' => 'Testimonials',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 0,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+  );
+
+  foreach ($items as $item) {
+    menu_link_save($item);
+  }
+}

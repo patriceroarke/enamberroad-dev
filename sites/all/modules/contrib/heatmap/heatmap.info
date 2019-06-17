@@ -1,0 +1,12 @@
+name = "HeatMap"
+description = "HeatMap module records the users mouse behaviour and plots it using heatmaps."
+core = "7.x"
+package = Statistics
+configure = admin/config/system/heatmap
+dependencies[] = libraries
+; Information added by Drupal.org packaging script on 2015-02-15
+version = "7.x-1.0-alpha1"
+core = "7.x"
+project = "heatmap"
+datestamp = "1424031182"
+

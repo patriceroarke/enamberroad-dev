@@ -1,0 +1,14 @@
+$breakpoint-to-ems: true;
+@include sgs-change('output', 'float');
+@include sgs-change('debug', true);
+
+// Define Grids and gutters
+@include add-grid(4);
+@include add-gutter(1/4);
+@include add-grid(12 at $tab);
+
+.layout-container {
+  background-color: white;
+  max-width: $desk_width;
+  margin: 0 auto;
+}

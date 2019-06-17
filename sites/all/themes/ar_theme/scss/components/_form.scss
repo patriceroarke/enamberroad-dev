@@ -1,0 +1,16 @@
+// Styles for Forms
+// -----------------------------------------------------------------------------
+
+// Search form at header
+#block-search-form {
+  margin-top:25px;
+  .form-control {
+    height: 25px;
+    border-radius: 0px;
+  }
+  .form-actions {
+    float: left;
+    margin-top: 5px;
+    margin-right: 5px;
+  }
+}

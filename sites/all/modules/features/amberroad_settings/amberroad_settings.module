@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Settings feature.
+ */
+
+include_once 'amberroad_settings.features.inc';

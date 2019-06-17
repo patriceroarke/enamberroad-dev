@@ -1,0 +1,69 @@
+.view-display-id-panel_industry_conference {
+  padding-top: 14px;
+  .views-row {
+    display: table;
+    margin: 0 7px 22px 0;
+    max-width: 955px;
+    .views-field {
+      padding-right: 12px;
+      @include breakpoint($tab) {
+        padding-right: 57px;
+      }
+      line-height: 20px;
+      a:visited {
+        color: $flamingo;
+      }
+    }
+    .views-field.views-field-field-event-logo {
+      padding-right: 0;
+      @include breakpoint(max-width $mobile-max) {
+        margin-bottom: 10px;
+      }
+      @include breakpoint($tab) {
+        display: table-cell;
+        vertical-align: top;
+        width: 300px;
+        padding-top: 7px;
+      }
+      .field-content img {
+        border: 1px solid #c0c0c0;
+        box-sizing: content-box;
+        height: auto;
+        max-width: 252px;
+      }
+    }
+    .views-field-body, p {
+      margin-top: 13px;
+      margin-bottom: 13px;
+    }
+    .views-field-nothing {
+      margin-top: 32px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid gray;
+      padding-right: 0;
+      &::after {
+        box-shadow: 0 1px 1px gray;
+        content: "";
+        display: block;
+        height: 1px;
+      }
+      a::before {
+        content: url("../images/outlook_icon.png");
+        display: inline-block;
+        padding-right: 24px;
+        padding-left: 10px;
+        vertical-align: top;
+        @include breakpoint($tab) {
+          padding-left: 20px;
+        }
+      }
+      span {
+        display: block;
+        padding-bottom: 5px;
+      }
+    }
+    .views-field-title a {
+      font-weight: bold;
+    }
+  }
+}

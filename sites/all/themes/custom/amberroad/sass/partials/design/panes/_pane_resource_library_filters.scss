@@ -1,0 +1,97 @@
+.resource-library-search-filters {
+  & > .pane-title {
+    margin-bottom: 5px;
+  }
+  form {
+    .form-item label {
+      font-weight: normal;
+      cursor: pointer;
+    }
+    input[type="checkbox"] {
+      display:none;
+      & + label::before {
+        display: inline-block;
+        width: 19px;
+        height: 19px;
+        margin: -2px 10px 0 0;
+        vertical-align: middle;
+        background: url("../images/checkbox.png") left top no-repeat;
+        cursor: pointer;
+        content: "";
+      }
+      & + label[for="edit-field-resource-type-tid-1"]::before {
+        background-position: left -47px;
+      }
+      & + label[for="edit-field-resource-type-tid-2"]::before {
+        background-position: left -69px;
+      }
+      & + label[for="edit-field-resource-type-tid-3"]::before {
+        background-position: left -92px;
+      }
+      & + label[for="edit-field-resource-type-tid-4"]::before {
+        background-position: left -115px;
+      }
+      & + label[for="edit-field-resource-type-tid-28"]::before {
+        background-position: left -138px;
+      }
+      & + label[for="edit-field-resource-type-tid-20"]::before {
+        background-position: left -161px;
+      }
+      & + label[for="edit-field-resource-type-tid-26"]::before {
+        background-position: left -184px;
+      }
+      & + label[for="edit-field-resource-type-tid-19"]::before {
+        background-position: left -207px;
+      }
+      & + label[for="edit-field-resource-type-tid-43"]::before {
+        background-position: left -230px;
+      }
+      & + label[for="edit-field-resource-type-tid-6"]::before {
+        background-position: left -253px;
+      }
+      & + label[for="edit-field-resource-type-tid-29"]::before {
+        background-position: left -276px;
+      }
+      & + label[for="edit-field-resource-type-tid-5"]::before {
+        background-position: left -299px;
+      }
+      &:checked + label::before {
+        background-position: left -23px;
+      }
+    }
+  }
+  .views-exposed-form .views-exposed-widget {
+    clear: both;
+    padding: 0.5em 0.5em 1em 0;
+    & > label {
+      color: #f64c3f;
+      font-size: convert(12, pts, px);
+      font-weight: normal;
+      padding-left: 26px;
+      padding-bottom: 5px;
+    }
+    .bef-toggle {
+      color: black;
+      text-decoration: none;
+      &:hover {
+        text-decoration: none;
+      }
+      &::before {
+        background: transparent url("../images/checkbox.png") no-repeat scroll left 0;
+        content: "";
+        display: inline-block;
+        height: 19px;
+        margin-right: 9px;
+        vertical-align: middle;
+        width: 19px;
+        margin-top: -2px;
+      }
+    }
+    .select-none-checkbox.bef-toggle::before {
+      background-position: left -23px;
+    }
+    .bef-checkboxes > .form-item {
+      line-height: 26px;
+    }
+  }
+}

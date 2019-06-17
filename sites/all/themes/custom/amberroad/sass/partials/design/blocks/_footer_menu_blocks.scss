@@ -1,0 +1,112 @@
+////////////////////////
+// Left footer block
+////////////////////////
+#block-amberroad-blocks-footer-social-links-left {
+  padding-top: 10px;
+}
+
+.left_social_icons a {
+  margin-right: 4px;
+}
+
+////////////////////////
+// Middle footer blocks
+////////////////////////
+
+#block-menu-menu-footer-top {
+	ul.menu {
+    margin-bottom: 0;
+    margin-top: 24px;
+    @include breakpoint ($tab) {
+      margin-top: 10px;
+    }
+    @include breakpoint ($desk) {
+      margin-bottom: -8px;
+    }
+  }
+}
+
+#block-menu-menu-footer-bottom {
+  ul.menu {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+#block-amberroad-blocks-footer-copyright, .copyright {
+  color: $grey-shade-6;
+  font-size: 10px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+#block-amberroad-blocks-footer-copyright {
+  @include breakpoint(max-width $mobile-max) {
+    display: none;
+  }
+  @include breakpoint(max-width $tab-max) {
+    margin-bottom: 10px;
+    padding-top: 5px;
+  }
+}
+
+.copyright-block {
+  @include breakpoint($tab) {
+    display: none;
+  }
+  padding-bottom: 24px;
+  padding-top: 24px;
+  text-align: center;
+}
+
+#block-menu-menu-footer-top, #block-menu-menu-footer-bottom {
+  ul.menu {
+    padding-left: 0;
+    text-align: center;
+  }
+  li.leaf {
+    display: inline-block;
+    list-style-image: none;
+    list-style-type: unset;
+    margin-left: 0;
+    padding: 0;
+    a {
+      color: $grey-shade-6;
+      font-size: 10px;
+      &:hover {
+        color: $bamboo;
+        text-decoration: none;
+      }
+    }
+    &::after {
+      color: $grey-shade-6;
+      content: "|";
+      font-size: 10px;
+      padding-left: 3px;
+    }
+    &:hover::after {
+      color: $orange-blaze;
+    }
+    &.last::after {
+      content: "";
+    }
+  }
+}
+
+.mobile_social_icons a {
+  margin-right: 10px;
+}
+
+////////////////////////
+// Right footer block
+////////////////////////
+
+#block-amberroad-blocks-footer-social-links-right {
+  padding-right: 20px;
+  padding-top: 10px;
+  text-align: right;
+}
+
+.right_social_icons a {
+  margin-left: 4px;
+}

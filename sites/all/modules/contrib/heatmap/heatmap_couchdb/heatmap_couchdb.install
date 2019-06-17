@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Installation file.
+ */
+ 
+/**
+ * Requirements hook for HeatMap CouchDB module, check that curl exists.
+ */
+function heatmap_couchdb_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+  if ($phase == 'install') {
+    if (!function_exists('curl_version')) {
+      $requirements['heatmap_couchdb'] = array(
+        'title' => $t('Heatmap CouchDB'),
+        'description' => $t('You need to enable PHP curl before using this module.'),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+  return $requirements;
+}
+
+/**
+ * Uninstall hook for HeatMap CouchDB modules.
+ */
+function heatmap_couchdb_uninstall() {
+  module_load_include('module', 'heatmap_couchdb');
+  $answer = heatmap_couchdb_deletedatabase();
+  if (isset($answer->error)) {
+    drupal_set_message(t('We were not able to remove the CouchDB database on uninstall, please do this your self'), 'error');
+  }
+  
+  variable_del('heatmap_couchdb_fqdn');
+  variable_del('heatmap_couchdb_port');
+  variable_del('heatmap_couchdb_authentication');
+  variable_del('heatmap_couchdb_username');
+  variable_del('heatmap_couchdb_password');
+}

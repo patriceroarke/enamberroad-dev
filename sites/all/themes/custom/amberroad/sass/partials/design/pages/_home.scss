@@ -1,0 +1,52 @@
+.page-home {
+  .panels-generic-content-main-inside {
+    position: relative;
+    background-color: white;
+    padding-top: 8px;
+    padding-bottom: 12px;
+    @include breakpoint($tab) {
+      padding-top: 30px;
+    }
+  }
+}
+
+.pane-amberroad-blocks-homepage-featured {
+  @include layout-at((
+    'grid': 12,
+    'gutter': 1/100
+  ), $tab) {
+    @include grid-span(4,1, $output-style: 'isolation');
+    width: 34.278%;
+  }
+}
+
+.pane-homepage-webinar {
+  @include layout-at((
+    'grid': 12,
+    'gutter': 1/8
+  ), $tab) {
+    @include grid-span(4,5, $output-style: 'isolation');
+    margin-left: 34.645%;
+  }
+}
+
+.pane-homepage-event {
+  @include layout-at((
+    'grid': 12,
+    'gutter': 1/8
+  ), $tab) {
+    @include grid-span(4,9, $output-style: 'isolation');
+  }
+}
+
+.pane-news-ticker-desktop-view {
+  clear: both;
+  max-height: 34px;
+  max-width: 1000px;
+}
+
+.pane-news-ticker-mobile-view {
+  clear: both;
+  padding-left: 20px;
+  padding-right: 20px;
+}

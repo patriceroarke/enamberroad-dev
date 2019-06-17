@@ -1,0 +1,10 @@
+.not-front .panels-generic-content-banner-inside {
+  .pane-node-field-banner-menu-details {
+    border-bottom-width: 4px;
+    border-bottom-style: solid;
+    border-bottom-color: $grey-shade-5;
+    @include breakpoint($tab) {
+      border-bottom-width: 12px;
+    }
+  }
+}

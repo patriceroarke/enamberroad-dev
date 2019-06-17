@@ -1,0 +1,46 @@
+.view-teaser-listing {
+  padding-bottom: 5px;
+  .view-header p {
+    margin-bottom: 11px;
+  }
+  .view-content {
+    .views-row {
+      padding-bottom: 5px;
+    }
+    .views-field {
+      padding-left: 40px;
+      display: block;
+      clear: both;
+    }
+    .views-field-title {
+      display: table;
+      padding-left: 0;
+      span::before {
+        background-image: url("../images/bullet.png");
+        background-position: center 6px;
+        background-repeat: no-repeat;
+        content: "";
+        display: table-cell;
+        height: 19px;
+        margin-right: 15px;
+        vertical-align: bottom;
+        width: 19px;
+      }
+      a {
+        display: table-cell;
+        padding-left: 20px;
+        color: $flamingo;
+        font-size: convert(11, pts, px);
+        font-weight: 700;
+      }
+    }
+    .views-label-field-podcast-presented-by, .views-field-field-podcast-presented-by .field-content {
+      float: left;
+      font-style: italic;
+      padding-right: 5px;
+    }
+    .views-field-field-podcast-short-summary p, .views-field-body p {
+      margin-top: 0;
+    }
+  }
+}

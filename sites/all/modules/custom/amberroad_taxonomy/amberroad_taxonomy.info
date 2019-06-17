@@ -1,0 +1,6 @@
+name = Amberroad Taxonomy
+description = "Handle taxonomy terms"
+core = 7.x
+package = "Amberroad"
+
+

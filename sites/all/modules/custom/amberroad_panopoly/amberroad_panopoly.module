@@ -1,0 +1,90 @@
+<?php
+
+
+
+
+/**
+ * Implementation of hook_entity_info_alter()
+ */
+function amberroad_panopoly_entity_info_alter(&$entity_info) {
+
+  // Video and Text
+  $entity_info['fieldable_panels_pane']['bundles']['video_and_text'] = array(
+    'label' => t('Add video with text'),
+    'description' => t('Add video with text'),
+    'pane category' => t('Custom'),
+    'pane top level' => TRUE,
+    'pane icon' => drupal_get_path('module', 'panopoly_widgets') . '/images/icon_video.png',
+    'admin' => array(
+      'path' => 'admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type',
+      'bundle argument' => 4,
+      'real path' => 'admin/structure/fieldable-panels-panes/manage/video_and_text',
+      'access arguments' => array('administer fieldable panels panes'),
+    ),
+  );
+  // Video and Text
+  $entity_info['fieldable_panels_pane']['bundles']['box'] = array(
+    'label' => t('Amberroad Block'),
+    'description' => t('Box with text, image and button'),
+    'pane category' => t('Custom'),
+    'pane top level' => TRUE,
+    'pane icon' => drupal_get_path('module', 'panopoly_widgets') . '/images/icon_video.png',
+    'admin' => array(
+      'path' => 'admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type',
+      'bundle argument' => 4,
+      'real path' => 'admin/structure/fieldable-panels-panes/manage/box',
+      'access arguments' => array('administer fieldable panels panes'),
+    ),
+  );
+  $entity_info['fieldable_panels_pane']['view modes']['video_vertical'] = array(
+    'label' => 'Video vertical',
+    'custom settings' => FALSE,
+  );
+  $entity_info['fieldable_panels_pane']['view modes']['video_horizontal'] = array(
+    'label' => 'Video horizontal',
+    'custom settings' => FALSE,
+  );
+  $entity_info['fieldable_panels_pane']['view modes']['image_button'] = array(
+    'label' => 'Image with text & button',
+    'custom settings' => FALSE,
+  );
+  $entity_info['fieldable_panels_pane']['view modes']['image_text'] = array(
+    'label' => 'Image with text vertical',
+    'custom settings' => FALSE,
+  );
+  $entity_info['fieldable_panels_pane']['view modes']['image_text_h'] = array(
+    'label' => 'Image with text horizontal',
+    'custom settings' => FALSE,
+  );
+  $entity_info['fieldable_panels_pane']['view modes']['logo_text_v'] = array(
+    'label' => 'Logo with text vertical',
+    'custom settings' => FALSE,
+  );
+  $entity_info['fieldable_panels_pane']['view modes']['image_block'] = array(
+    'label' => 'Image block',
+    'custom settings' => FALSE,
+  );
+  $entity_info['fieldable_panels_pane']['view modes']['header'] = array(
+    'label' => 'Header',
+    'custom settings' => FALSE,
+  );
+}
+
+
+
+function amberroad_panopoly_preprocess_panels_pane(&$variables) {
+  // check if pane type is fieldable panels pane
+  // check if a view mode is set
+  if ($variables['pane']->type === "fieldable_panels_pane" && isset($variables['content']['#view_mode'])) {
+    // add extra class to panel, related to the view mode
+    //unset($variables['title']);
+    $variables['title'] = '';
+    $variables['classes_array'][] = 'view-mode-' . $variables['content']['#view_mode'];
+  }
+}
+
+
+
+function amberroad_panopoly_preprocess_fieldable_panels_pane(&$variables) {
+  $variables['theme_hook_suggestions'][] = 'fieldable_panels_pane__'.$variables['elements']['#bundle'].'__'.$variables['elements']['#view_mode'];
+}

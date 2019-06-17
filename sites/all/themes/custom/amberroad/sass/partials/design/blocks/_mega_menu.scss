@@ -1,0 +1,210 @@
+#block-tb-megamenu-amberroad-main-menu {
+  @include clearfix;
+  .tb-megamenu {
+    background-color: $orange-roughy;
+    border-bottom: 3px solid $saffron;
+    @include breakpoint($tab-wide) {
+      .span12.mega-col-nav .mega-inner {
+        padding: 10px 0;
+      }
+      .mega-nav > li a, .dropdown-menu .mega-nav > li a {
+        padding: 5px 10px;
+      }
+      .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
+        padding: 5px 10x;
+        background-image: none;
+      }
+    }
+  }
+  .nav {
+    & > li {
+      @include breakpoint($tab-wide) {
+        width: 19.2%;
+        height: 46px;
+      }
+      & > a {
+        font-size: 13px;
+        font-weight: normal;
+        padding: 8px 0 8px 4px;
+        text-align: left;
+        border-right: medium none;
+        line-height: 1em;
+        text-transform: uppercase;
+        font-weight: bold;
+        color: white;
+        @include breakpoint($tab-wide) {
+          padding: 16px 0 17px;
+          text-align: center;
+        }
+        &:focus, &:hover {
+          background-color: $grey-shade-2;
+        }
+      }
+      &:first-child, &:last-child {
+        @include breakpoint($tab-wide) {
+          width: 11.6%;
+        }
+      }
+      .mega-dropdown-menu {
+        @include breakpoint($tab-wide) {
+          max-width: 200px;
+          min-width: 160px;
+          width: 100%;
+        }
+      }
+      &:hover > .dropdown-toggle .caret {
+        border-bottom-color: #ff9800;
+        border-top-color: #ff9800;
+      }
+    }
+    & > li.open > a::before {
+      visibility: visible;
+    }
+    & > .active > a:hover, & > .active > a:focus, & > .open > a {
+      background-color: $grey-shade-2;
+      color: $orange-peel;
+      text-decoration: underline;
+    }
+    & > .active > a {
+      background-color: $orange-roughy;
+    }
+    &  > .dropdown > .dropdown-toggle .caret {
+      border-bottom-color: #eee;
+      border-top-color: #eee;
+      margin-top: 5px;
+    }
+  }
+  .btn-navbar {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: medium none;
+    box-shadow: none;
+    padding: 0;
+    text-shadow: none;
+    margin-bottom: 0;
+    text-align: left;
+    width: 100%;
+  }
+  .menu-title {
+    display: inline-block;
+    font-size: 11px;
+    padding-bottom: 8px;
+    padding-left: 20px;
+    padding-top: 8px;
+    padding-right: 20px;
+    text-transform: uppercase;
+    @include breakpoint($tab) {
+      font-size: 13px;
+    }
+    &::after {
+      content: url('../images/icon-arrow-down.png');
+      padding-left: 8px;
+      position: relative;
+      top: -1px;
+      @include breakpoint($tab) {
+        top: -2px;
+      }
+    }
+  }
+  .nav-collapse {
+    margin-top: 7px;
+    @include breakpoint($tab-wide) {
+      margin-top: 0;
+    }
+    .nav {
+      & > li {
+        @include breakpoint(max-width 979px) {
+          border-top: 1px solid white;
+        }
+        & > a {
+          border-bottom: medium none;
+          background-color: $orange-roughy;
+        }
+      }
+      li a {
+        border-top: medium none;
+      }
+      & > .active > a:hover, & > .active > a:focus, & > .open > a {
+        background-color: $grey-shade-2;
+      }
+    }
+  }
+  @include breakpoint($tab-wide) {
+    .tb-megamenu-item {
+      &.level-2 > a, &.level-3 > a, &.level-4 > a {
+        font-size: 14px;
+      }
+    }
+  }
+  @include breakpoint(max-width 979px) {
+    .dropdown-menu {
+      border: medium none;
+      box-shadow: none;
+      padding-top: 12px;
+      padding-bottom: 10px;
+      background-color: $orange-roughy;
+      li > a {
+        color: white;
+        margin-left: 0;
+        &:hover {
+          color: $grey-shade-2;
+        }
+      }
+      .active > a, .active > a:hover {
+        background-color: transparent;
+        background-image: none;
+      }
+    }
+    .mega-inner {
+      padding: 0;
+    }
+    .tb-megamenu-item {
+      &.level-2 {
+        margin-left: 12px;
+        margin-bottom: 18px;
+        & > a {
+          font-size: 12px;
+          padding: 0;
+          font-weight: bold;
+          text-decoration: underline;
+          text-transform: uppercase;
+        }
+      }
+      &.level-3, &.level-4 {
+        list-style-image: url("../images/icon-arrow-white.png");
+        display: list-item;
+        & > a {
+          font-size: 12px;
+          padding: 0;
+          line-height: 17px;
+        }
+        &:hover {
+          list-style-image: url("../images/icon-arrow-grey.png");
+        }
+      }
+      &.level-3.mega-group {
+        & > a {
+          font-weight: normal;
+          text-transform: none;
+        }
+        &::after, &::before {
+          content: none;
+        }
+      }
+    }
+    .tb-megamenu-submenu.mega-group-ct {
+      margin-left: 12px;
+    }
+    .tb-megamenu-subnav.mega-nav.level-3 {
+      padding-left: 12px;
+    }
+  }
+  .row-fluid [class*="span"] {
+    min-height: auto;
+  }
+  .mobile-nav {
+    @include breakpoint(max-width 979px) {
+      height: 400px !important;
+      overflow: scroll !important;
+    }
+  }
+}

@@ -1,0 +1,92 @@
+/**
+* Typography: Headings, body text, lists, code, and more for a versatile and durable typography system.
+*/
+
+html {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+body {
+  font-family: $base-font-family;
+  font-size: convert(11, pts, px); /* converted from points */
+  line-height: convert(150, percent, px); /* converted from percents */
+  color: black;
+  background-image: url("../images/bkgd_image.jpg");
+}
+
+main {
+  background-color: white;
+}
+
+// Headings
+
+h1 {
+  font-size: convert(20, pts, px);
+  font-variant: small-caps;
+  font-weight: normal;
+}
+
+h2 {
+  font-size: convert(16, pts, px);
+  font-variant: small-caps;
+  font-weight: normal;
+}
+
+h3 {
+  font-size: convert(11, pts, px);
+  font-weight: 700;
+}
+
+
+// Links
+
+a {
+  font-size: convert(11, pts, px);
+  &:link {
+    color: $flamingo;
+    text-decoration: none;
+  }
+
+  &:hover, &:focus {
+    color: $flamingo;
+    text-decoration: underline;
+  }
+
+  &:visited {
+    color: $flamingo;
+  }
+}
+
+
+// Lists
+
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+  margin-bottom: 0;
+}
+
+// Misc.
+
+hr {
+  height: 1px;
+  border: 1px solid #666;
+  padding-bottom: -1px;
+  margin: 1em 0;
+}
+
+em {
+  font-style: italic;
+}

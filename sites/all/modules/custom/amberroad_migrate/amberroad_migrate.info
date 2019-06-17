@@ -1,0 +1,28 @@
+name = Amberroad Migrate
+description = Migration framework for Amberroad content migration.
+core = 7.x
+package = Amberroad
+
+dependencies[] = migrate
+dependencies[] = querypath
+
+; Node migration files.
+files[] = node/basic_page.node.inc
+files[] = node/testimonial.node.inc
+files[] = source_parser.inc
+files[] = node/press_release.node.inc
+files[] = node/press_coverage.node.inc
+files[] = node/industry_conference.node.inc
+files[] = node/enterprise-pages.node.inc
+files[] = node/enterprise-solution_area.node.inc
+files[] = node/mid-market-pages.node.inc
+files[] = node/mid-market-solution_area.node.inc
+files[] = node/global-knowledge-pages.node.inc
+files[] = node/global-knowledge-solution_area.node.inc
+files[] = node/industry_conference.node.inc
+files[] = menu/amberroad_main.menu.inc
+files[] = node/webinars_page.node.inc
+files[] = node/resources_page.node.inc
+files[] = node/legal_pages.node.inc
+files[] = node/awards.node.inc
+

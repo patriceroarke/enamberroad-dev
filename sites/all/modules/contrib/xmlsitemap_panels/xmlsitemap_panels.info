@@ -1,0 +1,5 @@
+name = XML Sitemap Panels
+description = Provides a XML sitemap integraton with panels.
+dependencies[] = page_manager
+dependencies[] = xmlsitemap
+core = 7.x

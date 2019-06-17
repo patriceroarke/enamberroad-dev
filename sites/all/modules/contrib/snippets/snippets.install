@@ -1,0 +1,57 @@
+<?php
+/**
+ * @file
+ * Install ode for the Snippets module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function snippets_install() {
+  // Create snippets content type.
+  $types = array(
+    array(
+      'type' => 'snippets_code',
+      'name' => 'Code Snippet',
+      'base' => 'node_content',
+      'description' => "Default snippets content type.",
+      'custom' => 1,
+      'modified' => 1,
+      'locked' => 0,
+    ),
+  );
+  foreach ($types as $type) {
+    $type = node_type_set_defaults($type);
+    node_type_save($type);
+    node_add_body_field($type);
+    snippets_add_snippet_field($type);
+  }
+}
+
+/**
+ * Implements hook_field_schema().
+ */
+function snippets_field_schema($field) {
+  return array(
+    'columns' => array(
+      'description' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'sortable' => TRUE,
+      ),
+      'sourcecode' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+      ),
+      'language' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'sortable' => TRUE,
+      ),
+    ),
+  );
+}

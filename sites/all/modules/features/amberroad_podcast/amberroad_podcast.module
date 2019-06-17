@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Podcast feature.
+ */
+
+include_once 'amberroad_podcast.features.inc';

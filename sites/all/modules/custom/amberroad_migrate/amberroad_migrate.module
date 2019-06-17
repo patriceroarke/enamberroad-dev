@@ -1,0 +1,149 @@
+<?php
+
+/**
+ * @file
+ * This contains code to register and support core migration for Amberroad
+ * Website.
+ */
+
+/**
+ * Implements hook_flush_caches().
+ */
+function amberroad_migrate_flush_caches() {
+  amberroad_migrate_register_migrations();
+}
+
+/**
+ * This function registers the migration for Amberroad content migration.
+ */
+function amberroad_migrate_register_migrations() {
+  // These are our common arguments for all our migrations.
+  $common_arguments = array(
+    'group_name' => 'Amberroad Migration',
+  );
+
+  // Register Basic page migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Basic page'),
+    'machine_name' => 'AmberroadMigrateBasicPages',
+  );
+  Migration::registerMigration('AmberroadMigrateBasicPagesNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Testimonial migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Testimonials'),
+    'machine_name' => 'AmberroadMigrateTestimonial',
+  );
+  Migration::registerMigration('AmberroadMigrateTestimonialNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Press Relase migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Press Relase'),
+    'machine_name' => 'AmberroadMigratePressRelase',
+  );
+  Migration::registerMigration('AmberroadMigratePressRelaseNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Press Coverage migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Press Coverage'),
+    'machine_name' => 'AmberroadMigratePressCoverage',
+  );
+  Migration::registerMigration('AmberroadMigratePressCoverageNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Industry Conference migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Industry Conference'),
+    'machine_name' => 'AmberroadMigrateConference',
+  );
+  Migration::registerMigration('AmberroadMigrateConferenceNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Enterprise pages migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Enterprise Pages'),
+    'machine_name' => 'AmberroadMigrateEnterprisePages',
+
+  );
+  Migration::registerMigration('AmberroadMigrateEnterprisePagesNodeMigration', $arguments['machine_name'], $arguments);
+
+   // Register Enterprise Solution Area migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Enterprise Solution Area'),
+    'machine_name' => 'AmberroadMigrateEnterpriseSolutionArea',
+    'dependencies' => array('AmberroadMigrateEnterprisePages'),
+  );
+  Migration::registerMigration('AmberroadMigrateEnterpriseSolutionAreaNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Mid-Market pages migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Mid-Market Pages'),
+    'machine_name' => 'AmberroadMigrateMidMarketPages',
+  );
+  Migration::registerMigration('AmberroadMigrateMidMarketPagesNodeMigration', $arguments['machine_name'], $arguments);
+
+   // Register Mid-Market Solution Area migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Mid-Market Solution Area'),
+    'machine_name' => 'AmberroadMigrateMidMarketSolutionArea',
+    'dependencies' => array('AmberroadMigrateMidMarketPages'),
+  );
+  Migration::registerMigration('AmberroadMigrateMidMarketSolutionAreaNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Global-Knowledge pages migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Global-Knowledge Pages'),
+    'machine_name' => 'AmberroadMigrateGlobalKnowledgePages',
+  );
+  Migration::registerMigration('AmberroadMigrateGlobalKnowledgePagesNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Amberroad Menu migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Amberroad Menu'),
+    'machine_name' => 'AmberroadMenus',
+  );
+  Migration::registerMigration('AmberroadMenusMigration', $arguments['machine_name'], $arguments);
+
+  // Register Webinars page migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Webinars'),
+    'machine_name' => 'AmberroadMigrateWebinars',
+  );
+  Migration::registerMigration('AmberroadMigrateWebinarsNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Resource page migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Resources'),
+    'machine_name' => 'AmberroadMigrateResource',
+  );
+  Migration::registerMigration('AmberroadMigrateResourceNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Legal page migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Legal pages'),
+    'machine_name' => 'AmberroadMigrateLegalPages',
+  );
+  Migration::registerMigration('AmberroadMigrateLegalPagesNodeMigration', $arguments['machine_name'], $arguments);
+
+  // Register Awards page migraiton.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of Awards pages'),
+    'machine_name' => 'AmberroadMigrateAwards',
+  );
+  Migration::registerMigration('AmberroadMigrateAwardsNodeMigration', $arguments['machine_name'], $arguments);
+}
+
+/**
+ * Implements hook_migrate_api().
+ */
+function amberroad_migrate_migrate_api() {
+  $disable_hooks = array();
+  $api = array(
+    'api' => 2,
+    'groups' => array(
+      'Amberroad Migration' => array(
+        'title' => 'Amberroad Content migration',
+        'disable_hooks' => $disable_hooks,
+      ),
+    ),
+  );
+  return $api;
+}

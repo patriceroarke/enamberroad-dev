@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * Implements hook_init().
+ *
+ * Selectively redirects from evolve.amberroad.com/page.html
+ * to amberroad.com/page.html
+ *
+ */
+function amberroad_en_init() {
+
+  global $conf;
+
+  // Adds the language specific css file
+  $amberroad_site = variable_get('amberroad_site', 'us');
+
+  // For non-admin users, Redirect to the main Domain if trying to access node
+  // from subdomain
+  if($amberroad_site == 'us' && !user_has_role(4) && module_exists('domain')){
+
+    $current_domain = domain_get_domain();
+    $path = $conf['evolve_paths'];
+
+    if(!in_array(current_path(), $path) && ($current_domain['subdomain']=='evolve.amberroad.dev' || $current_domain['subdomain']=='evolve.amberroad.com')){
+      $amberroad_root_domain_id = 1;
+      $amberroad_root_domain = domain_lookup($amberroad_root_domain_id);
+      $path = domain_get_uri($amberroad_root_domain);
+      //drupal_goto($path, array(), 301);
+    }
+  }
+}
+
+
+/**
+ * Implements hook_url_outbound_alter().
+ * Rewrite the urls of the panel pages to amberroad.com
+ * instead of evolve.amberroad.com
+ *
+ */
+function amberroad_en_url_outbound_alter(&$path, &$options, $original_path) {
+
+  if(module_exists('domain')){
+    $current_domain = domain_get_domain();
+
+    $amberroad_us_paths = array(
+      'html/rl_podcasts.shtml',
+      'html/search/resources',
+      'html/speaking_engagements.shtml',
+      'html/speaking_engagements.shtml',
+      'html/testimonials.shtml',
+      'html/webinars.shtml',
+      'html/seminars.shtml',
+      'html/industry_events.shtml',
+      'html/press.shtml',
+      'html/awards.shtml',
+      'html/press_coverage.shtml',
+      'html/press_releases.shtml',
+      'html/rl_webinars.shtml',
+      'html/company_webinars.shtml',
+      'html/rl_podcasts.shtml',
+    );
+
+    if(in_array($path, $amberroad_us_paths) && ($current_domain['subdomain']=='evolve.amberroad.dev' || $current_domain['subdomain']=='evolve.amberroad.com')){
+      $options['absolute'] = true;
+      $options['external'] = true;
+      $path = 'http://amberroad.com/'.$path;
+    }
+  }
+
+}

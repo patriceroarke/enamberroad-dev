@@ -1,0 +1,23 @@
+/* Define width variables */
+$mobile_width: 300px;
+$tab_width: 768px;
+$tab_wide_width: 980px;
+$desk_width: 1000px;
+$desk_wide_width: 1200px;
+
+/* Break points */
+
+////////////////////////
+// Min width media queries
+////////////////////////
+$mobile: $mobile_width;
+$tab: $tab_width;
+$tab-wide: $tab_wide_width;
+$desk: $desk_width;
+$desk-wide: $desk_wide_width;
+
+////////////////////////
+// Max width media queries
+////////////////////////
+$mobile-max: 767px;
+$tab-max: 999px;

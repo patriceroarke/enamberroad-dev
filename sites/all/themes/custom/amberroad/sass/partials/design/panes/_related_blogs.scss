@@ -1,0 +1,88 @@
+.related_blogs_wrapper {
+  clear: both;
+  background-color: #dcddde;
+  background-image: url("../images/feed.jpg");
+  border: 1px solid #c7c8ca;
+  border-radius: 15px;
+  box-shadow: 3px 3px 3px #c7c8ca;
+  color: #6c6a6a;
+  font-size: 16px;
+  font-weight: normal;
+  height: auto;
+  margin: 50px 9px 10px 0;
+  min-height: 200px;
+  @include breakpoint($tab) {
+    padding-left: 11px;
+  }
+  .field-name-field-related-blog-post {
+    .blogs-link h1 {
+      margin-left: 27px;
+      margin-bottom: 12px;
+      margin-top: 18px;
+      border-bottom: 1px solid #ed8c23;
+      padding-bottom: 7px;
+      padding-left: 10px;
+      width: 75.3%;
+      a {
+        color: $orange-roughy;
+        font-family: "Arial Narrow";
+        font-size: 20px;
+        font-weight: normal;
+        text-transform: uppercase;
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
+    .rss-items {
+      padding-bottom: 9px;
+      padding-right: 9px;
+      padding-left: 0;
+      margin-top: 20px;
+      margin-bottom: 0;
+    }
+    li.rss-item {
+      line-height: convert(14, pts, px);
+      background-image: url("../images/bullet-orange.png");
+      background-position: left 7px;
+      background-repeat: no-repeat;
+      margin-left: 21px;
+      padding-left: 22px;
+      list-style: outside none none;
+      br {
+        display: none;
+      }
+    }
+    a.rss-item {
+      color: $grey-shade-2;
+      display: block;
+      font-size: convert(11, pts, px);
+      font-weight: normal;
+      line-height: convert(14, pts, px);
+      text-decoration: none;
+      padding-bottom: 14px;
+      &:hover {
+        color: $orange-roughy;
+      }
+    }
+  }
+  .read_more_blogs {
+    padding-bottom: 25px;
+    padding-top: 5px;
+    padding-right: 20px;
+    padding-left: 10px;
+    text-align: right;
+    a.btmlink {
+      font-size: convert(11, pts, px);
+      color: $grey-shade-2;
+      &:hover {
+        text-decoration: none;
+        color: $orange-roughy;
+      }
+      &:after {
+        content: url("../images/orange-arrow.png");
+        padding-left: 8px;
+      }
+    }
+  }
+}

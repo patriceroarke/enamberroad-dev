@@ -1,0 +1,30 @@
+.panels-amber-content-layout {
+  
+  .panels-generic-content-banner {
+    @include grid-span(4,1);
+    @include layout-at(12, $tab) {
+      @include grid-span(12,1);
+    }
+  }
+  .panels-generic-content-main {
+    @include clearfix;
+  }
+  .panels-generic-content-main-inside {
+    @include grid-span(4,1);
+    @include layout-at(12, $tab) {
+      @include grid-span(12,1);
+    }
+  }
+  .panels-generic-content-main-inside.has-sidebar {
+    @include grid-span(4,1);
+    @include layout-at(12, $tab) {
+      @include grid-span(9,1);
+    }
+  }
+  .panels-generic-content-sidebar-inside {
+    @include grid-span(4,1);
+    @include layout-at(12, $tab) {
+      @include grid-span(3,10);
+    }
+  }
+}

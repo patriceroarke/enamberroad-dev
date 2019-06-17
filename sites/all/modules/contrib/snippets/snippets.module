@@ -1,0 +1,196 @@
+<?php
+/**
+ * @file
+ * Code for the Snippets feature.
+ */
+
+/**
+ * Implements hook_field_info().
+ */
+function snippets_field_info() {
+  return array(
+    'snippets_code' => array(
+      'label' => t('Snippets field'),
+      'description' => t('Store code snippets'),
+      'default_widget' => 'snippets_default',
+      'default_formatter' => 'snippets_default',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function snippets_field_widget_info() {
+  return array(
+    'snippets_default' => array(
+      'label' => t('Default'),
+      'field types' => array('snippets_code'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function snippets_field_formatter_info() {
+  return array(
+    'snippets_default' => array(
+      'label' => t('Default snippet display'),
+      'field types' => array('snippets_code'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function snippets_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  // Load geshifilter.
+  module_load_include('inc', 'geshifilter');
+  $enabled_languages = _geshifilter_get_enabled_languages();
+
+  $widget = $element;
+  $widget['#delta'] = $delta;
+
+  switch ($instance['widget']['type']) {
+    case 'snippets_default':
+      $element['description'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Description'),
+        '#default_value' => isset($items[$delta]['description']) ? $items[$delta]['description'] : '',
+      );
+      $element['sourcecode'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Source code'),
+        '#default_value' => isset($items[$delta]['sourcecode']) ? $items[$delta]['sourcecode'] : '',
+      );
+      $element['language'] = array(
+        '#type' => 'select',
+        '#title' => t('Syntax highlighting mode'),
+        '#default_value' => isset($items[$delta]['language']) ? $items[$delta]['language'] : '',
+        '#options' => $enabled_languages,
+        '#description' => t('Select the syntax highlighting mode to use for the source code.'),
+      );
+
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function snippets_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+    // This formatter simply outputs the field as text and with a color.
+    case 'snippets_default':
+      foreach ($items as $delta => $item) {
+        module_load_include('inc', 'geshifilter', 'geshifilter.pages');
+
+        $sourcecode = $item['sourcecode'];
+        $language = $item['language'];
+        $description = check_plain($item['description']);
+
+        if (!empty($sourcecode) && !empty($language)) {
+          $element[$delta] = array(
+            '#theme' => 'snippets_formatter_default',
+            '#geshi_process' => geshifilter_geshi_process($sourcecode, $language),
+            '#language' => $language,
+            '#description' => isset($description) ? $description : '',
+          );
+        }
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function snippets_field_is_empty($item, $field) {
+  return empty($item['sourcecode']);
+}
+
+/**
+ * Creates and attaches a snippets_code field to the snippets_code content
+ * type.
+ *
+ * @param $type
+ *   Content type object
+ *
+ * @param $label
+ *   Field label.
+ *
+ * @return
+ *   Returns a field instance.
+ */
+function snippets_add_snippet_field($type, $label = 'Snippets') {
+  $field = field_info_field('snippets_code');
+  $instance = field_info_instance('node', 'snippets_code', $type->type);
+  if (empty($field)) {
+    $field = array(
+      'field_name' => 'snippets_code',
+      'type' => 'snippets_code',
+      'entity_types' => array('node'),
+      'cardinality' => '-1',
+    );
+    $field = field_create_field($field);
+  }
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => 'snippets_code',
+      'entity_type' => 'node',
+      'bundle' => $type->type,
+      'label' => $label,
+      'widget' => array('type' => 'snippets_default'),
+      'settings' => array(),
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'snippets_default',
+        ),
+      ),
+    );
+    $instance = field_create_instance($instance);
+  }
+  return $instance;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function snippets_theme() {
+  return array(
+    'snippets_formatter_default' => array(
+      'render element' => 'element',
+    ),
+  );
+}
+
+/**
+ * Displays snippets formatter.
+ */
+function theme_snippets_formatter_default($variables) {
+  $element = $variables['element'];
+  $output = '<div class="snippets-code-wrapper">';
+
+  if (!empty($element['#description'])) {
+    $output .= '<div class="snippets-code-description">' . $element['#description'] . '</div>';
+  }
+  $output .= '<div class="snippets-code-geshi">' . $element['#geshi_process'] . '</div>';
+  $output .= '</div>';
+  return $output;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function snippets_views_api() {
+  return array('api' => 3.0);
+}

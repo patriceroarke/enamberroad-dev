@@ -1,0 +1,727 @@
+<?php
+/**
+ * @file
+ * Main module file.
+ */
+
+define('SELECTIVE_TWEETS_CACHE_BIN', 'cache_selective_tweets');
+define('SELECTIVE_TWEETS_API_BASE_URL', 'https://api.twitter.com');
+define('SELECTIVE_TWEETS_API_VERSION', '1.1');
+define('SELECTIVE_TWEETS_EMBED', 'embed');
+define('SELECTIVE_TWEETS_RAW', 'raw');
+define('SELECTIVE_TWEETS_LIGHT', 'light');
+define('SELECTIVE_TWEETS_DARK', 'dark');
+define('ST_SELECTION_MODE_LIVE', 1);
+define('ST_SELECTION_MODE_FAVORITES', 2);
+define('ST_SELECTION_MODE_SEARCH', 3);
+
+/**
+ * Implements hook_features_api().
+ */
+function selective_tweets_features_api() {
+  return array(
+    'selective_tweets' => array(
+      'name' => 'Selective Tweets block settings',
+      'file' => drupal_get_path('module', 'selective_tweets') . '/includes/selective_tweets.features.inc',
+      'default_hook' => 'selective_tweets_block_settings',
+      'feature_source' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function selective_tweets_menu() {
+  $items = array();
+
+  $items['admin/config/services/selective-tweets'] = array(
+    'title' => 'Selective Tweets',
+    'description' => t('Configure the Selective Tweets Twitter feed.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('selective_tweets_admin_form'),
+    'access arguments' => array('administer selective tweets'),
+    'file' => 'includes/selective_tweets.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  // Ajax callback for loading new Tweets.
+  $items['selective-tweets/feed/load/%selective_tweets_block/%/%'] = array(
+    'page callback' => 'selective_tweets_twitter_feed_build',
+    'page arguments' => array(3, 4, 5),
+    'access arguments' => array('access content'),
+    'file' => 'includes/selective_tweets.pages.inc',
+    'type' => MENU_CALLBACK,
+    'delivery callback' => 'selective_tweets_ajax_deliver',
+  );
+
+  // Create an array of block settings.
+  $settings = array(
+    'title' => 'Add Selective Tweets block',
+    'description' => 'Add a new Selective Tweets block.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('selective_tweets_add_block_form'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'includes/selective_tweets.admin.inc',
+  );
+
+  // Add a local action to the block configuration page.
+  $items['admin/structure/block/add-selective-tweets-block'] = array(
+    'access callback' => '_selective_tweets_block_admin_access',
+  ) + $settings;
+
+  // Get the default site theme.
+  $default_theme = variable_get('theme_default', 'bartik');
+
+  // Add a local action to the per-theme block configuration pages.
+  foreach (list_themes() as $key => $theme) {
+    if ($key != $default_theme) {
+      $items['admin/structure/block/list/' . $key . '/add-selective-tweets-block'] = array(
+        'access callback' => '_selective_tweets_themes_access',
+        'access arguments' => array($theme),
+      ) + $settings;
+    }
+  }
+
+  $items['admin/structure/block/administer/selective-tweets/%/delete'] = array(
+    'title' => 'Delete Selective Tweets block',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('selective_tweets_block_delete', 5),
+    'access callback' => '_selective_tweets_block_admin_access',
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/selective_tweets.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function selective_tweets_permission() {
+  return array(
+    'administer selective tweets' => array(
+      'title' => t('Administer Selective Tweets general settings'),
+      'description' => t('Control the <a href="@url">Twitter API settings</a> and development options.', array(
+        '@url' => url('admin/config/services/selective-tweets'),
+      )),
+    ),
+    'administer selective tweets blocks' => array(
+      'title' => t('Administer Selective Tweets blocks'),
+      'description' => t('Ability to create and manage Selective Tweets blocks on the <a href="@url">blocks administration page</a>.', array(
+        '@url' => url('admin/structure/block'),
+      )),
+    ),
+  );
+}
+
+/**
+ * Menu item access callback: only admin or enabled themes can be accessed.
+ */
+function _selective_tweets_themes_access($theme) {
+  return user_access('administer blocks') && user_access('administer selective tweets blocks') && drupal_theme_access($theme);
+}
+
+/**
+ * Menu item access callback: only the users with these permissions have access.
+ */
+function _selective_tweets_block_admin_access() {
+  return user_access('administer blocks') && user_access('administer selective tweets blocks');
+}
+
+/**
+ * Implements hook_theme().
+ */
+function selective_tweets_theme($existing, $type, $theme, $path) {
+  return array(
+    'selective_tweets_raw_tweet' => array(
+      'variables' => array(
+        'block_delta',
+        'tweet' => NULL,
+      ),
+      'template' => 'templates/selective-tweets-raw-tweet',
+    ),
+    'selective_tweets_throbber' => array(
+      'variables' => array(
+        'message' => t('Loading tweets'),
+      ),
+      'template' => 'templates/selective-tweets-throbber',
+    ),
+  );
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter();
+ */
+function selective_tweets_form_block_admin_display_form_alter(&$form, &$form_state, $form_id) {
+  $result = db_query('SELECT delta FROM {selective_tweets_block}');
+
+  // Add delete links to Selective Tweets blocks.
+  foreach ($result as $block) {
+    $form['blocks']['selective_tweets_' . $block->delta]['delete'] = array(
+      '#type' => 'link',
+      '#title' => t('delete'),
+      '#href' => 'admin/structure/block/administer/selective-tweets/' . $block->delta . '/delete',
+      '#access' => _selective_tweets_block_admin_access(),
+    );
+  }
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function selective_tweets_module_implements_alter(&$implementations, $hook) {
+  // Always make sure selective_tweets executes
+  // hook_selective_tweets_query_alter() and
+  // hook_selective_tweets_tweet_object_alter() first.
+  if ($hook == 'selective_tweets_query_alter' || $hook == 'selective_tweets_tweet_object_alter') {
+    $module = 'selective_tweets';
+    $group = array($module => $implementations[$module]);
+    unset($implementations[$module]);
+    $implementations = $group + $implementations;
+  }
+}
+
+/**
+ * Implements hook_selective_tweets_query_alter().
+ */
+function selective_tweets_selective_tweets_query_alter(&$params, &$endpoint, $context) {
+  // Apply the Twitter filters from the block settings to the request which will
+  // be sent to Twitter to retrieve Tweets.
+  // Other modules can use this hook to alter the request parameters at will.
+  $data = $context['block_config']['data'];
+
+  // Get endpoint data.
+  $api_version = variable_get('selective_tweets_api_version', SELECTIVE_TWEETS_API_VERSION);
+  $api_base_url = variable_get('selective_tweets_api_base_url', SELECTIVE_TWEETS_API_BASE_URL);
+
+  // Default params for all requests.
+  $params += array(
+    'screen_name' => $data['screen_name'],
+    'trim_user' => TRUE,
+    'exclude_replies' => TRUE,
+    'include_rts' => $data['include_retweets'],
+    'include_entities' => FALSE,
+    'result_type' => 'recent',
+  );
+
+  switch ($data['display_mode']) {
+    case ST_SELECTION_MODE_SEARCH:
+      $params += array(
+        'count' => 200,
+        'q' => '',
+      );
+
+      if ($data['from_account'] != '') {
+        $data['from_account'] = str_replace(array('from:', '@'), '', $data['from_account']);
+        $data['from_account'] = str_replace(array(' AND ', ' OR '), ' ', $data['from_account']);
+        $data['from_account'] = trim($data['from_account']);
+        $data['from_account'] = str_replace(' ', ' OR ', $data['from_account']);
+        $data['from_account'] = preg_replace('#(^|\W)(?!AND|OR)(\w+)#', '$1from:$2', $data['from_account']);
+        $params['q'] .= ' ' . $data['from_account'];
+      }
+
+      if ($data['to_account'] != '') {
+        $data['to_account'] = str_replace(array('to:', '@'), '', $data['to_account']);
+        $data['to_account'] = preg_replace('#(^|\W)(?!AND|OR)(\w+)#', '$1to:$2', $data['to_account']);
+        $params['q'] .= ' ' . $data['to_account'];
+      }
+
+      if ($data['user_mentions'] != '') {
+        $data['user_mentions'] = str_replace('@', '', $data['user_mentions']);
+        $data['user_mentions'] = preg_replace('#(^|\W)(?!AND|OR)(\w+)#', '$1@$2', $data['user_mentions']);
+        $params['q'] .= ' ' . $data['user_mentions'];
+      }
+
+      if ($data['hashtags'] != '') {
+        $data['hashtags'] = str_replace('#', '', $data['hashtags']);
+        $data['hashtags'] = preg_replace('#(^|\W)(?!AND|OR)(\w+)#', '$1#$2', $data['hashtags']);
+        $params['q'] .= ' ' . $data['hashtags'];
+      }
+
+      if ($data['banned_words'] != '') {
+        $data['banned_words'] = str_replace('-', '', $data['banned_words']);
+        $data['banned_words'] = preg_replace('#(^|\W)(?!AND|OR)(\w+)#', '$1-$2', $data['banned_words']);
+        $params['q'] .= ' ' . $data['banned_words'];
+      }
+
+      // Due to duplicate results coming from Twitter, retweets are disabled
+      // when embedded Tweets are displayed.
+      // See https://www.drupal.org/node/2715811.
+      if (!$data['include_retweets'] || $data['render_mode'] == SELECTIVE_TWEETS_EMBED) {
+        $params['q'] .= ' ' . '-filter:retweets';
+      }
+
+      $params['q'] = trim($params['q']);
+
+      $endpoint = $api_base_url . '/' . $api_version . '/search/tweets.json';
+      break;
+
+    case ST_SELECTION_MODE_FAVORITES:
+      $params += array(
+        'count' => 200,
+      );
+      $endpoint = $api_base_url . '/' . $api_version . '/favorites/list.json';
+      break;
+
+    case ST_SELECTION_MODE_LIVE:
+      $params += array(
+        'count' => 200,
+      );
+      $endpoint = $api_base_url . '/' . $api_version . '/statuses/user_timeline.json';
+      break;
+  }
+
+  // If we don't have to load extra Tweets, we might just as well request only
+  // the number of Tweets on the initial page. We add 5 more Tweets to
+  // compensate deleted Tweets, which Twitter removes from the response after
+  // the count has been applied in its query.. *sigh*
+  if ($data['count'] == 0) {
+    $params['count'] = $data['initial_count'] + 5;
+  }
+}
+
+/**
+ * Implements hook_selective_tweets_tweet_object_alter().
+ */
+function selective_tweets_selective_tweets_tweet_object_alter(&$tweet, $context) {
+  // Convert entities to links in the Tweet.
+  if ($context['block_config']['data']['insert_links']) {
+    _selective_tweets_insert_links($tweet);
+  }
+
+  // Add a created_timestamp to the Tweet opbject so it's easier to
+  // choose how to display the datetime through overrides.
+  if (isset($tweet->created_at) && $tweet->created_at && $created_timestamp = _selective_tweets_get_timestamp($tweet->created_at)) {
+    $tweet->created_timestamp = $created_timestamp;
+  }
+
+  // Add Tweet action links to the Tweet object to use in the tpl.
+  $tweet->link_reply_to = 'https://twitter.com/intent/tweet?in_reply_to=' . $tweet->id_str;
+  $tweet->link_retweet = 'https://twitter.com/intent/retweet?tweet_id=' . $tweet->id_str;
+  $tweet->link_favorite = 'https://twitter.com/intent/favorite?tweet_id=' . $tweet->id_str;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function selective_tweets_block_info() {
+  $blocks = array();
+  $result = db_query('SELECT delta, info FROM {selective_tweets_block} ORDER BY info');
+
+  foreach ($result as $block) {
+    $blocks[$block->delta]['info'] = $block->info;
+    $blocks[$block->delta]['cache'] = DRUPAL_CACHE_CUSTOM;
+  }
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function selective_tweets_block_configure($delta='') {
+  if ($delta) {
+    // Load the block configuration.
+    $config = selective_tweets_block_load($delta);
+    // Unserialize the selective tweets block settings.
+    $data = $config['data'];
+    // Remove the serialized selective tweets block settings.
+    unset($config['data']);
+    // Add the selective tweets settings to the block settings.
+    $selective_tweets_block = $config + $data;
+  }
+  else {
+    $selective_tweets_block = array();
+  }
+
+  module_load_include('inc', 'selective_tweets', 'includes/selective_tweets.admin');
+
+  return selective_tweets_custom_block_form($selective_tweets_block);
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function selective_tweets_block_save($delta = '', $edit = array()) {
+  module_load_include('inc', 'selective_tweets', 'includes/selective_tweets.admin');
+  selective_tweets_custom_block_save($edit, $delta);
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function selective_tweets_block_view($delta = '') {
+  module_load_include('inc', 'selective_tweets', 'includes/selective_tweets.pages');
+
+  // Load the configuration.
+  if (!$config = selective_tweets_block_load($delta)) {
+    // If there is no config found, this block is broken. Return nothing.
+    if (variable_get('selective_tweets_debug', FALSE)) {
+      watchdog('selective_tweets', 'A Selective Tweets block that is no longer existing is attempted to be loaded.', array(), WATCHDOG_WARNING);
+    }
+
+    return;
+  }
+
+  $wrapper_element = ($config['data']['render_mode'] == SELECTIVE_TWEETS_EMBED) ? 'div' : $config['data']['html_wrapper'];
+
+  // Get context if there is any (for token support).
+  $context_entity_id = NULL;
+
+  if ($config['data']['token_entity_type']) {
+    if ($context_entity = selective_tweets_get_context_entity($config['data']['token_entity_type'])) {
+      $context_entity_id = $context_entity->getIdentifier();
+    }
+  }
+
+  // Set block html ID.
+  $block_html_id = 'selective-tweets-block-' . $delta;
+
+  // Check if ajax load at page load is enabled or disabled and determine block
+  // content.
+  if ($config['data']['disable_ajax_load']) {
+    $block_content = selective_tweets_twitter_feed_build($config, $context_entity_id);
+    $block_classes = 'selective-tweets-content';
+
+    // If requested, hide the complete block if there are no results. This only
+    // works for the non-ajax loaded block.
+    if ($config['data']['hide_block_if_empty'] && !$block_content) {
+      return;
+    }
+  }
+  else {
+    $block_content = selective_tweets_twitter_feed_build($config, $context_entity_id, 0, 'throbber');
+    $block_classes = 'selective-tweets-content selective-tweets-async-load';
+  }
+
+  $block = array();
+  $block['subject'] = check_plain($config['info']);
+  $block['content'] = array(
+    '#markup' => theme('html_tag', array(
+      'element' => array(
+        '#tag' => $wrapper_element,
+        '#attributes' => array(
+          'id' => $block_html_id,
+          'class' => $block_classes,
+        ),
+        '#value' => drupal_render($block_content),
+      ),
+    )),
+  );
+
+  // Add block settings to javascript.
+  $settings = array(
+    'theme' => $config['data']['theme'],
+    'initial_load_url' => url('selective-tweets/feed/load/' . $delta . '/' . (isset($context_entity_id) ? $context_entity_id : 'no-context') . '/0', array('absolute' => TRUE)),
+  );
+  drupal_add_js(array('selective_tweets' => array($delta => $settings)), 'setting');
+
+  // Attach required libraries
+  $block['content']['#attached']['library'][] = array('system', 'drupal.ajax');
+
+  // Attach the Twitter widget script.
+  if ($config['data']['render_mode'] == SELECTIVE_TWEETS_EMBED) {
+    $block['content']['#attached']['js'][] = array(
+      'data' => drupal_get_path('module', 'selective_tweets') . '/js/widgets.js',
+      'type' => 'file',
+      'scope' => 'header',
+      'weight' => 0,
+    );
+  }
+
+  // Attach the script to load the initial content in the block.
+  $block['content']['#attached']['js'][] = array(
+    'data' => drupal_get_path('module', 'selective_tweets') . '/js/selective_tweets.js',
+    'type' => 'file',
+    'scope' => 'header',
+    'weight' => 1,
+  );
+
+  // Attach CSS.
+  $block['content']['#attached']['css'][] = drupal_get_path('module', 'selective_tweets') . '/css/selective_tweets.css';
+
+  // Add functional css concerning max height as set in the block settings.
+  if ($config['data']['maxheight'] > 0) {
+    $height_property = $config['data']['maxheight_style'];
+    $height_value = $config['data']['maxheight'];
+    drupal_add_css("#$block_html_id { $height_property:{$height_value}px; overflow-y:auto; }", array('type' => 'inline'));
+  }
+
+  return $block;
+}
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function selective_tweets_preprocess_block(&$variables) {
+  if ($variables['block']->module == 'selective_tweets') {
+    $variables['classes_array'][] = drupal_html_class('selective-tweets-block');
+    $variables['attributes_array']['data-id'] = $variables['elements']['#block']->delta;
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function selective_tweets_preprocess_selective_tweets_raw_tweet(&$variables) {
+  $variables['theme_hook_suggestions'][] = $variables['theme_hook_original'] . '__' . $variables['block_delta'];
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function selective_tweets_entity_update($entity, $type) {
+  // Remove the selective tweets cache in the context of this entity, as it got
+  // updated. Tokens might have changed.
+  if (_selective_tweets_token_support()) {
+    $entity_wrapper = entity_metadata_wrapper($type, $entity);
+    selective_tweets_cache_clear_by_entity_id($type, $entity_wrapper->getIdentifier());
+
+    // Also clear cache for current_user blocks.
+    if ($type == 'user') {
+      selective_tweets_cache_clear_by_entity_id('current_user', $entity_wrapper->getIdentifier());
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function selective_tweets_entity_delete($entity, $type) {
+  // Remove the selective tweets cache in the context of this entity, as it got
+  // deleted.
+  if (_selective_tweets_token_support()) {
+    $entity_wrapper = entity_metadata_wrapper($type, $entity);
+    selective_tweets_cache_clear_by_entity_id($type, $entity_wrapper->getIdentifier());
+
+    // Also clear cache for current_user blocks.
+    if ($type == 'user') {
+      selective_tweets_cache_clear_by_entity_id('current_user', $entity_wrapper->getIdentifier());
+    }
+  }
+}
+
+/**
+* Implements hook_flush_caches().
+*/
+function selective_tweets_flush_caches() {
+  return array(SELECTIVE_TWEETS_CACHE_BIN);
+}
+
+/**
+ * Delete all cache records belonging to a specific entity context.
+ *
+ * @param $type
+ *   The entity type.
+ * @param $id
+ *   The entity id.
+ */
+function selective_tweets_cache_clear_by_entity_id($type, $id) {
+  db_delete('cache_selective_tweets')
+    ->condition('cid', '%' . db_like('::' . $type . '_' . $id), 'LIKE')
+    ->execute();
+}
+
+/**
+ * Packages and sends the result of a page callback to the browser as HTML.
+ *
+ * @param $page_callback_result
+ *   The result of a page callback. Can be one of:
+ *   - NULL: to indicate no content.
+ *   - An integer menu status constant: to indicate an error condition.
+ *   - A string of HTML content.
+ *   - A renderable array of content.
+ */
+function selective_tweets_ajax_deliver($page_callback_result) {
+  // Only render content
+  print drupal_render($page_callback_result);
+}
+
+/**
+ * Returns information from database about
+ * a user-created (Selective Tweets) block.
+ *
+ * @param $delta
+ *   Delta of the block to get information for.
+ *
+ * @return
+ *   Associative array of information stored in the database for this block.
+ */
+function selective_tweets_block_load($delta) {
+  $result = &drupal_static(__FUNCTION__);
+
+  if (!isset($result[$delta])) {
+    $result[$delta] = db_query("SELECT * FROM {selective_tweets_block} WHERE delta = :delta", array(':delta' => $delta))->fetchAssoc();
+
+    if ($result[$delta]) {
+      $result[$delta]['data'] = unserialize($result[$delta]['data']);
+      $default_properties = _selective_tweets_block_properties();
+      $result[$delta]['data'] = array_merge($default_properties, $result[$delta]['data']);
+    }
+  }
+
+  return $result[$delta];
+}
+
+/**
+ * Load the current menu item's object or if requested the current user.
+ *
+ * @param $entity_type
+ *   The machine name of the entity or 'current_user' for getting the current
+ *   user object.
+ *
+ * @return
+ *   The entity as entity_metadata_wrapper or FALSE if no entity found.
+ */
+function selective_tweets_get_context_entity($entity_type) {
+  $result = &drupal_static(__FUNCTION__);
+
+  if (!isset($result[$entity_type])) {
+    $result[$entity_type] = FALSE;
+
+    if ($entity_type == 'current_user') {
+      global $user;
+      $user = user_load($user->uid);
+      $result[$entity_type] = entity_metadata_wrapper('user', $user);
+    }
+    else {
+      $menu_item_type = '';
+      $entity_object = _selective_tweets_menu_get_any_object($menu_item_type);
+
+      if ($entity_object && $menu_item_type == $entity_type) {
+        $result[$entity_type] = entity_metadata_wrapper($entity_type, $entity_object);
+      }
+    }
+  }
+
+  return $result[$entity_type];
+}
+
+/**
+ * Helper function to set up a connection to the Twitter API.
+ *
+ * @return
+ *   Object representing the Twitter connection.
+ */
+function selective_tweets_twitter_connect() {
+  module_load_include('inc', 'selective_tweets', 'includes/selective_tweets.twitter_oauth');
+
+  $consumer_key = variable_get('selective_tweets_consumer_key', NULL);
+  $consumer_secret = variable_get('selective_tweets_consumer_secret', NULL);
+  $oauth_token = variable_get('selective_tweets_oauth_token', NULL);
+  $oauth_token_secret = variable_get('selective_tweets_oauth_token_secret', NULL);
+
+  if (!isset($consumer_key)
+    || !isset($consumer_secret)
+    || !isset($oauth_token)
+    || !isset($oauth_token_secret)
+  ) {
+    throw new Exception(t('Twitter API settings are missing.'));
+  }
+
+  $connection = new TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_token_secret);
+
+  return $connection;
+}
+
+/**
+ * Helper function to retrieve the block properties and their defaults.
+ *
+ * @return
+ *   An array of block properties.
+ */
+function _selective_tweets_block_properties() {
+  return array(
+    'render_mode' => SELECTIVE_TWEETS_EMBED,
+    'token_entity_type' => 0,
+    'screen_name' => '',
+    'display_mode' => ST_SELECTION_MODE_LIVE,
+    'from_account' => '',
+    'to_account' => '',
+    'user_mentions' => '',
+    'hashtags' => '',
+    'banned_words' => '',
+    'include_retweets' => FALSE,
+    'initial_count' => 10,
+    'count' => 10,
+    'load_more_text' => 'Load more',
+    'insert_links' => TRUE,
+    'theme' => SELECTIVE_TWEETS_LIGHT,
+    'hide_media' => FALSE,
+    'hide_thread' => TRUE,
+    'maxwidth' => 550,
+    'maxheight' => 0,
+    'maxheight_style' => 'height',
+    'loading_text' => 'Loading Tweets',
+    'html_wrapper' => 'div',
+    'empty_text' => 'There were no tweets found.',
+    'hide_block_if_empty' => FALSE,
+    'pull_cached_time' => 5,
+    'stack_cached_time' => 180,
+    'tweet_stack_max' => 250,
+    'cache_rendered_tweet' => TRUE,
+    'disable_ajax_load' => FALSE,
+  );
+}
+
+/**
+ * Agnosticly get the current menu object. Passed type will be set for you.
+ * Function thanks to datalayer module.
+ *
+ * @param $return_type
+ *   Pass in a type variable by reference for later use.
+ *
+ * @return
+ *   Entity object of current menu callback page.
+ */
+function _selective_tweets_menu_get_any_object(&$return_type) {
+  // Figure out how this entity is loaded.
+  $type = FALSE;
+  $item = menu_get_item();
+
+  // Non-entities may not have load functions.
+  if (is_array($item['load_functions'])) {
+    $vals = array_values($item['load_functions']);
+    $load_function = $vals[0];
+    $arg_position = array_search($load_function, $item['load_functions']);
+
+    // Compare to entity types.
+    $entity_info = entity_get_info();
+    foreach ($entity_info as $i => $e) {
+      if ($e['load hook'] == $load_function) {
+        $type = $i;
+      }
+    }
+  }
+
+  // Many happy returns.
+  if ($type && $obj = menu_get_object($type, $arg_position)) {
+    if (is_object($obj)) {
+      $return_type = $type;
+      return $obj;
+    }
+    else {
+      return FALSE;
+    }
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Helper function to determine if tokens are supported.
+ *
+ * @return
+ *   TRUE if supported and FALSE if not.
+ */
+function _selective_tweets_token_support() {
+  $result = &drupal_static(__FUNCTION__);
+
+  if (!isset($result)) {
+    $result = (bool) (module_exists('token') && module_exists('entity'));
+  }
+
+  return $result;
+}

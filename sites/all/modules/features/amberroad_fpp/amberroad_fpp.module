@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the FPP feature.
+ */
+
+include_once 'amberroad_fpp.features.inc';

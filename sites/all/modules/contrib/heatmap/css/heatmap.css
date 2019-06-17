@@ -1,0 +1,96 @@
+#heatmap {
+    display: block;
+    overflow: hidden;
+    position: fixed;
+    text-decoration: none !important;
+    z-index: 9999;
+    right: -380px;
+    top: 40px;
+    width: 415px;
+    opacity: 0.8;
+    filter: alpha(opacity=40);
+    font-size: 12px;
+    color: #333;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+#heatmapbody {
+    z-index: 100;
+}
+
+#heatmapbody .scrollmapobject {
+    position: absolute;
+    width: 100%;
+    opacity: 0.5;
+    z-index: 100;
+}
+
+#heatmapbody .scrollmapobject span {
+    color: #fff;
+    font-size: 10px;
+}
+
+#heatmap-pullin {
+    cursor: pointer;
+    width: 35px;
+    height: 100px;
+    background: url('heatmap.png');
+    float: left;
+}
+
+#heatmap-content {
+    float: left;
+    min-height: 100px;
+    border: 2px solid #888;
+    background: #bbb;
+    padding: 20px;
+}
+
+#heatmap-heatmapform {
+    width: 336px;
+}
+
+#heatmap-heatmapform .form-item {
+    margin: 0 0 10px 0;
+    padding: 2px 0;
+}
+
+#heatmap-heatmapform .form-item label {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    font-weight: bold;
+}
+
+#heatmap-heatmapform  .form-item .description {
+    line-height: 12px;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+#heatmap-heatmapform #edit-heatmapenabled {
+    width: 30px; /* Chrome */
+    height: 30px; /* Chrome */
+    -moz-transform: scale(2); /* FF */
+    -o-transform: scale(2); /* Opera */
+    float: left;
+}
+
+#heatmap-heatmapform .form-item-heatmapenabled {
+    width: 100%;
+    float: left;
+}
+
+#heatmap-heatmapform .form-item-heatmapenabled label {
+    font-size: 20px;
+    margin: 5px 0 0 5px;
+    float: left;
+}
+
+#heatmap-heatmapform select.form-select{
+    width: 100%;
+    padding: 3px;
+    height: 25px;
+    font-size: 12px;
+}

@@ -1,0 +1,7 @@
+name = Easydisplay Layouts
+description = Panels layouts set to work with Easydisplay distribution
+core = 7.x
+package = Easydisplay
+
+dependencies[] = panels
+stylesheets[all][] = ed_layouts.css

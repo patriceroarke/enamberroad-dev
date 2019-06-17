@@ -1,0 +1,88 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Resources feature.
+ */
+
+include_once 'amberroad_resources.features.inc';
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function amberroad_resources_entity_info_alter(&$entity_info) {
+  $entity_info['node']['view modes']['resource_search'] = array(
+    'label' => t('Resource Search'),
+    'custom settings' => FALSE,
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function amberroad_resources_theme() {
+  $themes['node__resource__search'] = array(
+    'path' => drupal_get_path('module', 'amberroad_resources') . '/templates',
+    'render element' => 'elements',
+    'template' => 'node--resource--search',
+  );
+
+  return $themes;
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function amberroad_resources_node_view($node, $view_mode, $langcode) {
+  if ($view_mode == 'resource_search' && ($node->type == 'resource' || $node->type == 'webinar' || $node->type == 'podcast')) {
+
+    drupal_add_js(drupal_get_path('module', 'amberroad_resources') .'/js/resource-search-toggle.js', 'file');
+    
+    $wrapper = entity_metadata_wrapper('node', $node);
+    
+    $body = $wrapper->body->value();
+    $resource_type = $wrapper->field_resource_type->value();
+    
+    if ($node->type == 'webinar') {
+      $link = $wrapper->field_event_link->value();
+    }
+    elseif ($node->type == 'resource') {
+      $link = $wrapper->field_resource_link->value();
+    }
+    else {
+      $link['url'] = 'node/' . $node->nid;
+    }
+
+    $node->content['title'] = array(
+      '#markup' => l($node->title, $link['url']),
+      '#weight' => '-10',
+    );
+    
+    unset($node->content);
+    
+    $node->content['description']['#markup'] = "<div class='resource-search-block'>" . l($node->title, $link['url']) . "<div class='resource-search-desc' style='display:none;'><div class='desc'>" . substr(strip_tags($body['value']), 0, 180) . ".." . "</div><div class='resource-type'>" . $resource_type->name . "</div></div></div>";
+
+    if ($wrapper->__isset('field_resource_type')) {
+      $resource_type = $wrapper->field_resource_type->value();
+      $resource_wrapper = entity_metadata_wrapper('taxonomy_term', $resource_type);
+      if ($resource_wrapper->__isset('field_resource_search_logo')) {
+        $resource_icon = $resource_wrapper->field_resource_search_logo->value();
+        $icon =  array(
+          '#theme' => 'image',
+          '#path' => file_create_url($resource_icon['uri']),
+          '#width' => $resource_icon['width'],
+          '#height' => $resource_icon['height'],
+          '#weight' => '-30',
+          '#prefix' => '<div class="resource-type-icon">',
+          '#suffix' => '</div>',
+        );
+        $icon = render($icon);
+        if($link){
+          $icon = l($icon, $link['url'], array('html'=>TRUE));
+        }
+        $node->content['resource_icon']['#markup'] = $icon;
+        $node->content['resource_icon']['#weight'] = -100;
+      }
+    }
+    $node->title = '';
+  }
+}

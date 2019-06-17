@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * Generic function to insert some term in a vocabulary.
+ */
+function amberroad_taxonomy_insert_terms($machine_name) {
+  // Populate the given vocabulary.
+  if (($vocabulary = taxonomy_vocabulary_machine_name_load($machine_name)) != FALSE) {
+    $tree = taxonomy_get_tree($vocabulary->vid);
+
+    // Avoid drupal_get_path() because module may not be fully installed yet.
+    if (empty($tree) && ($handle = fopen(dirname(__FILE__) . '/install/' . $vocabulary->machine_name . '.csv', "r")) !== FALSE) {
+      while (($data = fgetcsv($handle, 1000)) !== FALSE) {
+        if (isset($data)) {
+          $term = new stdClass();
+          $term->name = $data[0];
+          $term->vid = $vocabulary->vid;
+          taxonomy_term_save($term);
+
+          watchdog(
+            'Taxonomy Import',
+            'New term %title has been created in %machine_name.',
+            array(
+              '%title' => $data[0],
+              '%machine_name' => $vocabulary->machine_name,
+            ),
+            WATCHDOG_DEBUG
+          );
+
+          // Save url alias of term for event type vocab.
+          if ($machine_name == 'resource_type' || $machine_name == 'career_location') {
+            $path = array();
+            $path['source'] = 'taxonomy/term/' . $term->tid;
+            $path['alias'] = $data[1];
+            path_save($path);
+
+            watchdog(
+              'Added url alias',
+              'Url alias %url has been added in %term.',
+              array(
+                '%url' => $data[1],
+                '%term' => $term->name,
+              ),
+              WATCHDOG_DEBUG
+            );
+          }
+
+        }
+      }
+      fclose($handle);
+    }
+  }
+}

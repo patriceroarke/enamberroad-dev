@@ -1,0 +1,36 @@
+.node-type-solution-area {
+  .pane-node-field-related-content-descriptio .field-item {
+    font-size: convert(11, pts, px);
+    font-weight: 700;
+  }
+  .field-name-field-related-solution-area-cont {
+    .field-label {
+      display: none;
+    }
+  }
+  .field-name-field-related-solution-area-cont {
+    padding-left: 20px;
+    @include breakpoint($tab) {
+      padding-left: 24px;
+    }
+    h2 {
+      font-variant: normal;
+      margin: 0;
+      display: table;
+      &::before {
+        color: black;
+        content: ".";
+        display: table-cell;
+        font-size: 24px;
+        font-weight: bolder;
+        padding-right: 8px;
+        position: relative;
+        top: -4px;
+      }
+      a {
+        color: $flamingo;
+        display: table-cell;
+      }
+    }
+  }
+}

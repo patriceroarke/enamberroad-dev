@@ -1,0 +1,37 @@
+.pane-views-slideshow-block {
+  .pane-title {
+    display: none;
+  }
+  .node-slideshow h2 {
+    display: none;
+  }
+  .flexslider {
+    border: medium none;
+    border-radius: 0;
+    margin: 0;
+  }
+  .flex-control-nav {
+    bottom: -6px;
+    padding-left: 18px;
+    @include breakpoint($tab) {
+      padding-left: 22px;
+    }
+    text-align: left;
+    li {
+      margin: 0 6px 0 0;
+    }
+  }
+  .flex-control-paging li a {
+    width: 8px;
+    height: 8px;
+    @include breakpoint($tab) {
+      width: 9px;
+      height: 9px;
+    }
+    background-color: #acacab;
+    box-shadow: none;
+    &.flex-active {
+      background-color: #e56126;
+    }
+  }
+}

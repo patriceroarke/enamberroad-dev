@@ -1,0 +1,486 @@
+<?php
+
+/**
+ * Cron job to release memcache to persistant storage and to aggregate daily data
+ */
+function heatmap_cron() {
+  module_load_include('inc', 'heatmap', 'heatmap.api');
+  if(variable_get('heatmap_memcache_enabled', '0') && module_exists('memcache')) {
+    if(variable_get('heatmap_lastrun', 0) < time()) {
+      heatmap_cache_to_persistant();
+      variable_set('heatmap_lastrun', time() + variable_get('heatmap_memcache_batch_time', '300'));
+    }
+  }
+  
+  if(variable_get('heatmap_dailycron', '') != date('d')) {
+    // Aggregate yesterdays data
+    module_invoke(variable_get('heatmap_storage_type', 'heatmap'), 'heatmap_aggregate', (strtotime(date('Y-m-d')) - 86400));
+    variable_set('heatmap_dailycron', date('d'));
+  }
+}
+ 
+/**
+ * User hook page_build to inject the javascript last minute.
+ */
+function heatmap_page_build(&$page) {
+  global $user, $theme;
+  
+  $themes = variable_get('heatmap_themes', array(variable_get('theme_default', '')));
+
+  // Add the popinbox for users who can see heatmaps
+  if(variable_get('heatmap_enabled', '0') && user_access('view heatmap') && isset($themes[$theme]) && $themes[$theme]) {
+    $page['page_bottom']['heatmap'] = array(
+      '#type' => 'markup',
+      '#markup' => theme('heatmap'),
+      '#attached' => array(
+        'css' => array(drupal_get_path('module', 'heatmap') . '/css/heatmap.css'),
+      ),
+    );
+    drupal_add_js(array(
+      'heatMapShow' => array(
+        'getUrl' => url('heatmap_get'),
+        'getAlignment' => variable_get('heatmap_alignment_' . $theme, '0'),
+        'getClass' => variable_get('heatmap_alignment_class_' . $theme, '')
+      ),
+    ), 'setting');
+
+    drupal_add_js(libraries_get_path('heatmap.js-develop') . '/build/heatmap.min.js');
+    drupal_add_js(drupal_get_path('module', 'heatmap') . '/js/heatmap_show.js', array('preprocess' => FALSE));
+  }
+  
+  
+  if(variable_get('heatmap_enabled', '0') && isset($themes[$theme]) && $themes[$theme]) {
+    // Filter away the user roles.
+    if (count(array_intersect(array_keys($user->roles), array_values(variable_get('heatmap_user_roles', array('1'))))) == 0) {
+      return;
+    }
+    
+    // Filter away the pages we dont want.
+    switch (variable_get('heatmap_show', '0')) {
+      case '0':
+      case '1':
+        $current_path = drupal_strtolower(drupal_get_path_alias($_GET['q']));
+        $paths = drupal_strtolower(variable_get('heatmap_paths', 'admin/*'));
+        $match = drupal_match_path($current_path, $paths);
+        if ($paths != $_GET['q']) {
+          $match = $match || drupal_match_path($_GET['q'], $paths);
+        }
+
+        if (!variable_get('heatmap_show', '0')) {
+          $match = $match ? 0 : 1;
+        }
+        break;
+
+      case '2':
+        $match = module_exists('php') ? php_eval(variable_get('heatmap_paths', 'admin/*')) : FALSE;
+        break;
+    }
+
+    if (!$match) {
+      return;
+    }
+    
+    drupal_add_js(array(
+      'heatMap' => array(
+        'saveUrl' => url('heatmap_track'),
+        'saveInterval' => 5000,
+        'maxInterval' => 120000,
+        'id' => '',
+        'getFragment' => (int) variable_get('heatmap_fragment', 100)
+      ),
+    ), 'setting');
+  
+    // Load the code.
+    drupal_add_js(drupal_get_path('module', 'heatmap') . '/js/heatmap.js', array('preprocess' => FALSE));
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function heatmap_theme($existing, $type, $theme, $path) {
+ 
+  $registry['heatmap'] = array(
+    'template' => 'heatmap',
+  );
+
+  return $registry;
+}
+
+/**
+ * Implements hook_preprocess_heatmap().
+ */
+function heatmap_preprocess_heatmap(&$variables) {
+  // Creates the form
+  $form = drupal_get_form('heatmap_heatmapform'); 
+  $variables['heatmap_form'] = drupal_render($form);  
+}
+
+/*
+ * Form for filtering heatmaps
+ */
+function heatmap_heatmapform($form, $form_values) {
+  global $theme;
+  
+  module_load_include('inc', 'heatmap', 'heatmap.api');
+  
+  $form = array();
+
+  $form['heatmapenabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable HeatMap'),
+    '#default_value' => '0'
+  );
+  
+  $form['heatmaptype'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose type'),
+    '#description' => t('Heatmap is eye/mousetracking, while Clickmap is where they clicked.'),
+    '#options' => array('1' => t('Heatmap'), '2' => t('Clickmap'), '3' => t('Scrollmap')),
+    '#default_value' => '1'
+  );
+  
+  $years = array();
+  for($i = date('Y', variable_get('heatmap_initdate', time())); $i < date('Y', variable_get('heatmap_initdate', 0))+15; $i++) {
+    $years[$i] = $i;
+  }
+  
+  for($i = 1; $i <= 12; $i++) {
+    $months[$i] = t(date('F', strtotime('2014-' . $i . '-1')));
+  }
+  
+  for($i = 1; $i <= 31; $i++) {
+    $days[$i] = $i;
+  }
+  
+  $form['heatmapfromyear'] = array(
+    '#type' => 'select',
+    '#prefix' => '<div style="display: inline-block; width: 33%">',
+    '#suffix' => '</div>',
+    '#title' => t('From'),
+    '#options' => $years,
+    '#default_value' => date('Y', time())
+  );
+  
+  $form['heatmapfrommonth'] = array(
+    '#type' => 'select',
+    '#prefix' => '<div style="display: inline-block; width: 33%">',
+    '#suffix' => '</div>',    
+    '#options' => $months,
+    '#default_value' => date('n', time())
+  );
+  
+  $form['heatmapfromday'] = array(
+    '#type' => 'select',
+    '#prefix' => '<div style="display: inline-block; width: 33%">',
+    '#suffix' => '</div>',    
+    '#options' => $days,
+    '#default_value' => date('j', time())
+  );
+  
+  $form['heatmaptoyear'] = array(
+    '#type' => 'select',
+    '#prefix' => '<div style="display: inline-block; width: 33%">',
+    '#suffix' => '</div>',
+    '#title' => t('To'),
+    '#options' => $years,
+    '#default_value' => date('Y', time())
+  );
+  
+  $form['heatmaptomonth'] = array(
+    '#type' => 'select',
+    '#prefix' => '<div style="display: inline-block; width: 33%">',
+    '#suffix' => '</div>',    
+    '#options' => $months,
+    '#default_value' => date('n', time())
+  );
+  
+  $form['heatmaptoday'] = array(
+    '#type' => 'select',
+    '#prefix' => '<div style="display: inline-block; width: 33%">',
+    '#suffix' => '</div>',    
+    '#options' => $days,
+    '#default_value' => date('j', time())
+  );   
+
+  $widths = module_invoke(variable_get('heatmap_storage_type', 'heatmap'), 'heatmap_getwidths');
+  $widths = !is_array($widths) ? array() : $widths;
+  if(variable_get('heatmap_alignment_' . $theme, '0')) {
+      $widths = array('' => t('All Widths')) + $widths;
+  }
+  $form['heatmapwidth'] = array(
+    '#type' => 'select',
+    '#title' => t('Filter on width'),
+    '#description' => t('Please note that you have to resize the window to the same width to get a correct heatmap result.'),
+    '#options' => $widths,
+    '#default_value' => ''
+  );
+  
+  $form['heatmapbrowser'] = array(
+    '#type' => 'select',
+    '#title' => t('Filter on browser'),
+    '#description' => t('Filter on the browser type.'),
+    '#options' => heatmap_browser_array(),
+    '#default_value' => ''
+  );  
+  
+  $languages = module_invoke(variable_get('heatmap_storage_type', 'heatmap'), 'heatmap_getlanguages');
+  $languages = !is_array($languages) ? array() : $languages;
+  $languages = array('' => t('All Languages')) + $languages;
+  $form['heatmaplanguage'] = array(
+    '#type' => 'select',
+    '#title' => t('Filter on language'),
+    '#description' => t('Choose the language you want to filter on.'),
+    '#options' => $languages,
+    '#default_value' => ' '
+  );
+  
+  if (module_exists('geoip')) {
+    $geoip = geoip_country_values();
+    asort($geoip);
+    $countries = array('' => t('All Countries')) + $geoip;
+    $form['heatmapcountry'] = array(
+      '#type' => 'select',
+      '#title' => t('Filter on country'),
+      '#description' => t('Filter on the country.'),
+      '#options' => $countries,
+      '#default_value' => ''
+    );    
+  } else {
+    // Empty if it does not exist
+    $form['heatmapcountry'] = array(
+      '#type' => 'hidden',
+      '#attributes' => array('id' => 'edit-heatmapcountry'),
+      '#value' => ''
+    );
+  }
+  
+  return $form;
+}
+ 
+/**
+ * Add two new permissions.
+ */
+function heatmap_permission() {
+  $perm['setup heatmap'] = array('title' => t('Setup HeatMap'));
+  $perm['view heatmap'] = array('title' => t('View HeatMap'));
+  return $perm;
+}
+
+/**
+ * Implements hook_modules_disabled. Disable memcache if not enabled anymore
+ */
+function heatmap_modules_disabled($modules) {
+  if (in_array('memcache', $modules) && variable_get('heatmap_memcache_enabled', '0')) {
+    variable_set('heatmap_memcache_enabled', '0');
+  }
+  
+  // If the module that is disabled is the current storage engine, we disable HeatMap
+  foreach($modules as $module) {
+    if(variable_get('heatmap_storage_type', 'heatmap') == $module) {
+      variable_set('heatmap_enabled', '0');
+      drupal_set_message(t('Since !module was the storage engine for HeatMap, we disabled HeatMap, please visit the settings to enable it again.', 
+        array('!module' => $module)
+      ), 'error');    
+    }
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function heatmap_menu() {
+  $items['heatmap_track'] = array(
+    'page callback' => 'heatmap_track',
+    'access callback' => TRUE,
+    'file' => 'heatmap.track.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['heatmap_get'] = array(
+    'page callback' => 'heatmap_get',
+    'access arguments' => array('view heatmap'),
+    'file' => 'heatmap.get.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/config/system/heatmap'] = array(
+    'page arguments' => array('heatmap_admin'),
+    'page callback' => 'drupal_get_form',
+    'title' => 'HeatMap Settings',
+    'access arguments' => array('setup heatmap'),
+    'file' => 'heatmap.admin.inc',
+    'description' => 'Manage when the user should be recorded.',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/*
+ * Implements hook_heatmap_get for normal storage
+ */
+function heatmap_heatmap_get($params) {
+
+  $query = db_select('heatmap', 'h');
+  $query->fields('h', array('clickdata', 'mousedata', 'positiondata', 'browser_width'));
+  if (isset($params['width'])) {
+    if(is_numeric($params['width'])) {
+      $query->condition('browser_width', $params['width'], '=');
+    }
+  }
+  
+  if (isset($params['navigator']) && $params['navigator']) {
+    if(is_numeric($params['navigator'])) {
+      $query->condition('navigator', $params['navigator'], '=');
+    }
+  }
+  
+  if (isset($params['language']) && $params['language']) {
+    if($params['language'] != '') {
+      $query->condition('browser_language', $params['language'], '=');
+    }
+  }
+  
+  if (isset($params['country']) && $params['country']) {
+    if($params['country'] != '') {
+      $query->condition('country', $params['country'], '=');
+    }
+  }
+  
+  $fromdate = strtotime($params['fromdate']);
+  $todate = strtotime($params['todate']);
+
+  $query->condition('time_added', $fromdate, '>=');
+  $query->condition('time_added', $todate, '<=');
+  
+  $query->condition('url', trim($params['url'], '/'), '=');
+  
+  return $query->execute();
+}
+
+/*
+ * Implements hook_heatmap_single for normal storage
+ */
+function heatmap_heatmap_single($data) {
+  if (isset($data['id']) && $data['id']) {
+    db_update('heatmap')
+    ->fields(array(
+      'clickdata' => $data['clickdata'],
+      'mousedata' => $data['mousedata'],
+      'positiondata' => $data['positiondata'],
+    ))
+    ->condition('id', $data['id'])
+    ->execute();
+    
+    return $data['id'];
+  } elseif($data['browser_width']) {
+    $id = db_insert('heatmap')
+          ->fields(array(
+            'navigator' => $data['navigator'],
+            'browser_width' => $data['browser_width'],
+            'browser_language' => $data['browser_language'],
+            'clickdata' => $data['clickdata'],
+            'mousedata' => $data['mousedata'],
+            'positiondata' => $data['positiondata'],
+            'country' => $data['country'],
+            'url' => $data['url'],
+            'time_added' => strtotime(date('Y-m-d'))
+          ))->execute();
+    if ($id) {
+      return $id;
+    } else {
+      return false;
+    }    
+  }
+}
+
+/*
+ * Implements hook_heatmap_batch for normal storage
+ */
+function heatmap_heatmap_batch($rows) {
+  foreach($rows as $row) {
+    heatmap_heatmap_single($row);
+  }
+}
+
+/*
+ * Implements hook_heatmap_getwidths for normal storage
+ */
+function heatmap_heatmap_getwidths() {
+  $cache = cache_get('heatmap_widths');
+  $return = array();
+  if(!$cache) {
+    $result = db_select('heatmap', 'h')->fields('h',array('browser_width'))->groupBy('h.browser_width')->orderBy('h.browser_width')->execute();
+    foreach($result as $row) {
+      $return[$row->browser_width] = $row->browser_width . 'px';
+    }
+    cache_set('heatmap_widths', $return, 'cache', (time()+300));
+  } else {
+    $return = $cache->data;
+  }
+  
+  return $return;
+}
+
+/*
+ * Implements hook_heatmap_heatmap_getlanguages for normal storage
+ */
+function heatmap_heatmap_getlanguages() {
+  $cache = cache_get('heatmap_languages');
+  $return = array();
+  if(!$cache) {
+    $result = db_select('heatmap', 'h')->fields('h',array('browser_language'))->groupBy('h.browser_language')->orderBy('h.browser_language')->execute();
+
+    foreach($result as $row) {
+      $return[$row->browser_language] = $row->browser_language;
+    }
+    cache_set('heatmap_languages', $return, 'cache', (time()+300));
+  } else {
+    $return = $cache->data;
+  }
+  return $return;
+}
+
+/*
+ * Implements hook_heatmap_heatmap_aggregate for normal storage
+ */
+function heatmap_heatmap_aggregate($time) {
+  $result = db_select('heatmap', 'h')->fields('h')->condition('time_added', $time)->execute();
+
+
+  $savearray = array();
+  foreach($result as $data) {
+    // The common aggregation filters (except date)
+    $key = md5($data->navigator . '_' . $data->browser_width . '_' . $data->browser_language . '_' . $data->url . '_' . $data->country);
+    if(isset($savearray[$key])) {
+      $savearray[$key]->removes[] = $data->id;
+      $savearray[$key]->counter++;
+      $savearray[$key]->clickdata = heatmap_combine_data($savearray[$key]->clickdata, json_decode($data->clickdata));
+      $savearray[$key]->mousedata = heatmap_combine_data($savearray[$key]->mousedata, json_decode($data->mousedata));
+      $savearray[$key]->positiondata = heatmap_combine_positiondata($savearray[$key]->positiondata, json_decode($data->positiondata));
+    } else {
+      $savearray[$key] = $data;
+      $savearray[$key]->counter = 1;
+      $savearray[$key]->removes = array($data->id);
+      $savearray[$key]->mousedata = json_decode($data->mousedata);
+      $savearray[$key]->clickdata = json_decode($data->clickdata);
+      $savearray[$key]->positiondata = json_decode($data->positiondata);
+    }
+  }
+  
+  foreach($savearray as $key => $array) {
+    if($array->counter > 1) {
+      if(is_array($array->removes)) {
+        db_query('DELETE FROM {heatmap} WHERE id IN (' . implode(',', $array->removes) . ')');
+      }
+      unset($array->removes);
+      unset($array->counter);
+      unset($array->id);
+      $array->mousedata = json_encode($array->mousedata);
+      $array->clickdata = json_encode($array->clickdata);
+      $array->positiondata = json_encode($array->positiondata);
+      heatmap_heatmap_single((array) $array);
+    }
+  }
+}

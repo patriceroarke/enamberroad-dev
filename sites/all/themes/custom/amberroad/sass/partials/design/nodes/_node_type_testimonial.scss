@@ -1,0 +1,17 @@
+.node-type-testimonial, .page-html-testimonialsshtml {
+  .pane-page-breadcrumb {
+    margin-bottom: 14px;
+  }
+  .pane-testimonial-detail-block {
+    @include breakpoint($tab) {
+      float: left;
+      width: 76.7%;
+    }
+  }
+  .pane-testimonials-list-block {
+    @include breakpoint($tab) {
+      float: left;
+      width: 23.2%;
+    }
+  }
+}

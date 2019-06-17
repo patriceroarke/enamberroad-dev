@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Panopoly Features Override feature.
+ */
+
+include_once 'amberroad_panopoly_override.features.inc';

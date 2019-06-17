@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Homepage feature.
+ */
+
+include_once 'amberroad_homepage.features.inc';

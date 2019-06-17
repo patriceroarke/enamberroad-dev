@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Client Banner feature.
+ */
+
+include_once 'amberroad_client_banner.features.inc';

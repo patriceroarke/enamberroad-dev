@@ -1,0 +1,22 @@
+.page-html-search-resources {
+  .panels-generic-content-main-inside {
+    padding-bottom: 25px;
+    .pane-resource-library-search {
+      @include grid-span(4,1);
+      @include layout-at(12, $tab) {
+        @include grid-span(9,1);
+        margin-right: 0;
+      }
+    }
+    .resource-library-search-filters {
+      @include grid-span(4,1);
+      @include layout-at(12, $tab) {
+        @include grid-span(3,10);
+        width: 25%;
+      }
+    }
+    .pane-custom {
+      max-width: 910px;
+    }
+  }
+}

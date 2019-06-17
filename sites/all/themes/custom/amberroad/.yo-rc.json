@@ -1,0 +1,16 @@
+{
+  "generator-drupal-theme": {
+    "projectName": "amberroad",
+    "projectSlug": "amberroad",
+    "baseTheme": "aurora",
+    "baseThemeSettings": {
+      "auroraType": "aurora"
+    },
+    "sassDir": "sass",
+    "cssDir": "css",
+    "jsDir": "js",
+    "imgDir": "images",
+    "fontsDir": "fonts",
+    "templateDir": "templates"
+  }
+}

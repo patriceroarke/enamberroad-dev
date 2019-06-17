@@ -1,0 +1,372 @@
+<?php
+
+define('HEATMAP_DATABASENAME', 'drupal_heatmap');
+define('HEATMAP_DESIGNNAME', '_design/heatmap');
+
+/**
+ * Implements hook_heatmapinfo
+ */
+function heatmap_couchdb_heatmap_info() {
+  $info = array();
+  
+  $info['name'] = t('Couch DB');
+  
+  return $info;
+}
+
+/**
+ * Implements hook_heatmap_settings
+ */
+function heatmap_couchdb_heatmap_settings() {
+  $form = array();
+  
+  if(!function_exists('curl_init')) {
+    $form['heatmap_disabled'] = array(
+      '#markup' => t('Please install Curl PHP library to use CouchDB plugin')
+    );
+    
+    return $form;
+  }
+  
+  $form['heatmap_couchdb_fqdn'] = array(
+    '#type' => 'textfield',
+    '#title' => t('CouchDB FQDN'),
+    '#description' => t('FQDN or ip, for instance localhost'),
+    '#attributes' => array('placeholder' => 'localhost'),
+    '#default_value' => variable_get('heatmap_couchdb_fqdn', '')
+  );
+  
+  $form['heatmap_couchdb_port'] = array(
+    '#type' => 'textfield',
+    '#title' => t('CouchDB Port'),
+    '#description' => t('Port of you couchdb instance'),
+    '#attributes' => array('placeholder' => '5984'),
+    '#default_value' => variable_get('heatmap_couchdb_port', '')
+  );
+  
+  $form['heatmap_couchdb_authentication'] = array(
+    '#type' => 'radios',
+    '#title' => t('CouchDB Authentication'),
+    '#description' => t('Choose what type of authentication you are running on you Couch DB instance'),
+    '#options' => array('1' => t('Admin Party (default)'), '2' => t('Basic Authentication')),
+    '#default_value' => variable_get('heatmap_couchdb_authentication', '1')
+  );
+  
+  $form['heatmap_couchdb_username'] = array(
+    '#type' => 'textfield',
+    '#title' => t('CouchDB Username'),
+    '#description' => t('If you are not running Admin Party on CouchDB, please give your username'),
+    '#default_value' => variable_get('heatmap_couchdb_username', '')
+  );
+  
+  $form['heatmap_couchdb_password'] = array(
+    '#type' => 'password',
+    '#title' => t('CouchDB Password'),
+    '#description' => t('If you are not running Admin Party on CouchDB, please give your password'),
+    '#default_value' => variable_get('heatmap_couchdb_password', '')
+  ); 
+  
+  return $form;
+}
+
+/**
+ * Implements hook_heatmap_validation (works as validate hook)
+ */
+function heatmap_couchdb_heatmap_validation($values) {
+  if (!function_exists('curl_init')) {
+    form_set_error('heatmap_storage_type', t('You have to install Curl library to use CouchDB plugin.'));
+  }
+  
+  if ($values['heatmap_couchdb_fqdn'] == '') {
+    form_set_error('heatmap_couchdb_fqdn', t('Please fill in a valid value of CouchDB FQDN'));
+  }
+  
+  if (!is_numeric($values['heatmap_couchdb_port'])) {
+    form_set_error('heatmap_couchdb_port', t('Please fill in a valid value of CouchDB port'));
+  }
+  
+  if (in_array($values['heatmap_couchdb_authentication'], array('2', '3')) && !$values['heatmap_couchdb_username']) {
+    form_set_error('heatmap_couchdb_username', t('Please fill in a valid value of CouchDB username'));
+  }
+  
+  if ($values['heatmap_couchdb_authentication'] == 2) {
+    $answer = heatmap_couchdb_call('', 'GET', '', '', $values['heatmap_couchdb_fqdn'], $values['heatmap_couchdb_port'], $values['heatmap_couchdb_username'], $values['heatmap_couchdb_password'], 2);
+  } else {
+    $answer = heatmap_couchdb_call('', 'GET', '', '', $values['heatmap_couchdb_fqdn'], $values['heatmap_couchdb_port']);
+  }
+  
+  if (!isset($answer->couchdb)) {
+    form_set_error('heatmap_couchdb_fqdn', t('Can not find CouchDB on that FQDN/Port'));
+  }
+}
+
+/**
+ * Implements hook_heatmap_submitting (works as submit hook)
+ */
+function heatmap_couchdb_heatmap_submitting($values) {
+  // Keep password if field is empty
+  if($values['heatmap_couchdb_password'] == '') {
+    $values['heatmap_couchdb_password'] = variable_get('heatmap_couchdb_password', '');
+  }
+  
+  // Create the database if it does not exist
+  if ($values['heatmap_couchdb_authentication'] == 2) {
+    $databases = heatmap_couchdb_getdb($values['heatmap_couchdb_fqdn'], $values['heatmap_couchdb_port'], $values['heatmap_couchdb_username'], $values['heatmap_couchdb_password'], 2);
+  } else {
+    $databases = heatmap_couchdb_getdb($values['heatmap_couchdb_fqdn'], $values['heatmap_couchdb_port']);
+  }  
+  if(!in_array(HEATMAP_DATABASENAME, $databases)) {
+    heatmap_couchdb_createdb($values['heatmap_couchdb_fqdn'], $values['heatmap_couchdb_port']);
+    heatmap_couchdb_createdesign($values['heatmap_couchdb_fqdn'], $values['heatmap_couchdb_port']);
+  }
+  
+  return $values;
+}
+
+/*
+ * Implements hook_heatmap_get for normal storage, needs to load all on url because of how couchdb works
+ */
+function heatmap_couchdb_heatmap_get($params) {
+  $startkey = trim($params['url'], '/');
+  $endkey = trim($params['url'], '/');
+  $fromdate = strtotime($params['fromdate']);
+  $todate = strtotime($params['todate']);
+  
+  $url = HEATMAP_DATABASENAME . '/' . HEATMAP_DESIGNNAME . '/_view/heatmap?startkey=' . json_encode($startkey) . '&endkey=' . json_encode($endkey);
+  $docs = heatmap_couchdb_get($url);
+  $returnarray = array();
+  foreach($docs->rows as $key => $doc) {
+    if(isset($params['width']) && ($params['width'] != '' && $params['width'] != $doc->value->browser_width)) continue;
+    if(isset($params['language']) && ($params['language'] != '' && $params['language'] != $doc->value->browser_language)) continue;
+    if(isset($params['navigator']) && ($params['navigator'] != '' && $params['navigator'] != $doc->value->navigator)) continue;
+    if($fromdate >= $doc->value->time_added) continue;
+    if($todate <= $doc->value->time_added) continue;
+    $returnarray[] = $doc->value;
+  }
+  return $returnarray;
+}
+
+/*
+ * Implements hook_heatmap_getwidths
+ */
+function heatmap_couchdb_heatmap_getwidths() {
+  $cache = cache_get('heatmap_widths');
+  if(!$cache) {
+    $url = HEATMAP_DATABASENAME . '/' . HEATMAP_DESIGNNAME . '/_view/widths?group=true';
+    $docs = heatmap_couchdb_get($url);
+    $return = array();
+    foreach($docs->rows as $key => $value) {
+      $return[$value->key] = $value->key . 'px';
+    }
+    cache_set('heatmap_widths', $return, 'cache', (time()+300));
+  } else {
+    $return = $cache->data;
+  }
+  
+  return $return;
+}
+
+/*
+ * Implements hook_heatmap_heatmap_getlanguage
+ */
+function heatmap_couchdb_heatmap_getlanguages() {
+  $cache = cache_get('heatmap_languages');
+  if(!$cache) {
+    $url = HEATMAP_DATABASENAME . '/' . HEATMAP_DESIGNNAME . '/_view/languages?group=true';
+    $docs = heatmap_couchdb_get($url);
+    $return = array();
+    foreach($docs->rows as $key => $value) {
+      $return[$value->key] = $value->key;
+    }
+    cache_set('heatmap_languages', $return, 'cache', (time()+300));
+  } else {
+    $return = $cache->data;
+  }
+  return $return;
+}
+
+/*
+ * Implements hook_heatmap_single
+ */
+function heatmap_couchdb_heatmap_single($data) {
+  $data['time_added'] = strtotime(date('Y-m-d'));
+  if(!$data['id']) {
+    // create id
+    $id = md5(time() . microtime());
+  } else {
+    $id = $data['id'];
+    $doc = heatmap_couchdb_get(HEATMAP_DATABASENAME . '/' . $id);
+    $data['_rev'] = $doc->_rev;
+  }
+  heatmap_couchdb_savedocument($id, $data);
+  return $id;
+}
+
+/*
+ * Implements hook_heatmap_batch
+ */
+function heatmap_couchdb_heatmap_batch($rows) {
+  foreach($rows as $key => $row) {
+    $rows[$key]['time_added'] = strtotime(date('Y-m-d'));
+    $rows[$key]['_id'] = md5(time() . microtime());
+  }
+  heatmap_couchdb_savebatch($rows);
+}
+
+/*
+ * Implements hook_heatmap_heatmap_aggregate
+ */
+function heatmap_couchdb_heatmap_aggregate($time) {
+  $url = HEATMAP_DATABASENAME . '/' . HEATMAP_DESIGNNAME . '/_view/date?startkey=' . $time . '&endkey=' . $time;
+  $docs = heatmap_couchdb_get($url);
+  
+  $savearray = array();
+  if(isset($docs->rows)) {
+    foreach($docs->rows as $row) {
+      $data = $row->value;
+      // The common aggregation filters (except date)
+      $key = md5($data->navigator . '_' . $data->browser_width . '_' . $data->browser_language . '_' . $data->url . '_' . $data->country);
+      if(isset($savearray[$key])) {
+        $savearray[$key]->removes[$data->_id] = $data->_rev;
+        $savearray[$key]->counter++;
+        $savearray[$key]->clickdata = heatmap_combine_data($savearray[$key]->clickdata, json_decode($data->clickdata));
+        $savearray[$key]->mousedata = heatmap_combine_data($savearray[$key]->mousedata, json_decode($data->mousedata));
+        $savearray[$key]->positiondata = heatmap_combine_positiondata($savearray[$key]->positiondata, json_decode($data->positiondata));
+      } else {
+        $savearray[$key] = $data;
+        $savearray[$key]->counter = 1;
+        $savearray[$key]->removes = array($data->_id => $data->_rev);
+        $savearray[$key]->mousedata = json_decode($data->mousedata);
+        $savearray[$key]->clickdata = json_decode($data->clickdata);
+        $savearray[$key]->positiondata = json_decode($data->positiondata);
+        unset($savearray[$key]->_id);
+        unset($savearray[$key]->_rev);
+      }
+    }
+    
+    foreach($savearray as $key => $array) {
+      if($array->counter > 1) {
+        foreach($array->removes as $remove => $rev) {
+          heatmap_couchdb_deletedocument($remove, $rev);
+        }
+        unset($array->removes);
+        unset($array->counter);
+        unset($array->id);
+        $array->mousedata = json_encode($array->mousedata);
+        $array->clickdata = json_encode($array->clickdata);
+        $array->positiondata = json_encode($array->positiondata);
+        $savearray[] = $array;
+      }
+      unset($savearray[$key]);
+    }
+    heatmap_couchdb_savebatch($savearray);
+  }
+}
+
+/*
+ * Helper function to create the design document for filtering
+ */
+function heatmap_couchdb_createdesign($fqdn = '', $port = '', $username = '', $password = '', $auth = '') {
+  $heatmap = array('map' => 'function(doc) {emit(doc.url, doc);}');
+  $date = array('map' => 'function(doc) {emit(doc.time_added, doc);}');
+  $languages = array('map' => 'function(doc) {if (doc.browser_language) {emit(doc.browser_language, 1);}}', 'reduce' => '_sum');
+  $widths = array('map' => 'function(doc) {if (doc.browser_width) {emit(doc.browser_width, 1);}}', 'reduce' => '_sum');
+  $data = json_encode(array('_id' => HEATMAP_DESIGNNAME, 'language' => 'javascript', 'views' => array('heatmap' => $heatmap, 'date' => $date, 'languages' => $languages, 'widths' => $widths)));
+  return heatmap_couchdb_call(HEATMAP_DATABASENAME . '/' . HEATMAP_DESIGNNAME, 'PUT', $data, '', $fqdn, $port, $username, $password, $auth);
+}
+
+/**
+ * Helper function to remove an id
+ */
+function heatmap_couchdb_deletedocument($id, $rev) {
+  return heatmap_couchdb_call(HEATMAP_DATABASENAME . '/' . $id . '?rev=' . $rev, 'DELETE');
+}
+
+/**
+ * Helper function to remove a database
+ */
+function heatmap_couchdb_deletedatabase() {
+  return heatmap_couchdb_call(HEATMAP_DATABASENAME, 'DELETE');
+}
+
+/**
+ * Helper function to save a document
+ */
+function heatmap_couchdb_savedocument($id, $data) {
+  return heatmap_couchdb_call(HEATMAP_DATABASENAME . '/' . $id, 'PUT', json_encode($data));
+}
+
+/**
+ * Helper function to save a batch
+ */
+function heatmap_couchdb_savebatch($data) {
+  return heatmap_couchdb_call(HEATMAP_DATABASENAME . '/_bulk_docs', 'POST', json_encode(array('docs' => $data)));
+}
+
+/**
+ * Helper function to create a database
+ */
+function heatmap_couchdb_createdb($fqdn = '', $port = '', $username = '', $password = '', $auth = '') {
+  return heatmap_couchdb_call(HEATMAP_DATABASENAME, 'PUT', '', '', $fqdn, $port, $username, $password, $auth);
+}
+
+/**
+ * Helper function to get all databases
+ */
+function heatmap_couchdb_getdb($fqdn = '', $port = '', $username = '', $password = '', $auth = '') {
+  return heatmap_couchdb_call('_all_dbs', 'GET', '', '', $fqdn, $port, $username, $password, $auth);
+}
+
+/**
+ * Helper function to get anything
+ */
+function heatmap_couchdb_get($url) {
+  return heatmap_couchdb_call($url, 'GET');
+}
+ 
+/**
+ * Helper function to make http calls
+ */
+function heatmap_couchdb_call($path, $type = 'GET', $data = array(), $cookie = '', $fqdn = '', $port = '', $username = '', $password = '', $auth = '', $json = true, $header = false) {
+  if (!$fqdn) $fqdn = variable_get('heatmap_couchdb_fqdn', '');
+  if (!$port) $port = variable_get('heatmap_couchdb_port', '');
+  if (!$username) $username = variable_get('heatmap_couchdb_username', '');
+  if (!$password) $password = variable_get('heatmap_couchdb_password', '');
+  if (!$auth) $auth = variable_get('heatmap_couchdb_authentication', '1');
+  
+  $ch = curl_init();
+  
+  $url = trim($fqdn, '/') . '/' . trim($path, '/');
+  
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_PORT, $port);
+  curl_setopt($ch, CURLOPT_HEADER, $header);
+  curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
+  
+  if((is_array($data) && count($data)) || $data) {
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+  }
+  
+  if($type == 'POST' && $path != '_session') {
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+  }
+  
+  if($cookie) {
+    curl_setopt($ch, CURLOPT_COOKIE, $data);
+  }
+  
+  if($auth == 2) {
+    curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password); 
+  }
+  
+  if($cookie) {
+    curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+  }
+  
+  $answer = curl_exec($ch);
+
+  curl_close($ch);
+  
+  return $json ? json_decode($answer) : $answer;
+}

@@ -1,0 +1,7 @@
+name = Blocks
+description = Contains custom blocks definition
+core = 7.x
+package = "Amberroad"
+
+; Dependencies
+

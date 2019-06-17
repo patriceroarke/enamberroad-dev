@@ -1,0 +1,85 @@
+<?php
+
+/**
+ * @file
+ * Installation file.
+ */
+
+/**
+ * Database schemas for HeatMap module.
+ */
+function heatmap_schema() {
+
+  $schema['heatmap'] = array(
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not NULL' => TRUE,
+        'length' => 11,
+      ),
+      'url' => array(
+        'type' => 'varchar',
+        'length' => 200,
+        'not NULL' => FALSE,
+        'default' => '',
+      ),
+      'navigator' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'not NULL' => FALSE,
+        'default' => '0',
+      ),
+      'browser_width' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not NULL' => TRUE,
+        'default' => '0',
+      ),
+      'browser_language' => array(
+        'type' => 'varchar',
+        'length' => 10,
+        'not NULL' => FALSE,
+        'default' => '',
+      ),
+      'clickdata' => array(
+        'type' => 'text',
+        'not NULL' => FALSE,
+      ),
+      'mousedata' => array(
+        'type' => 'text',
+        'not NULL' => FALSE,
+      ),
+      'positiondata' => array(
+        'type' => 'text',
+        'not NULL' => FALSE,
+      ),      
+      'country' => array(
+        'type' => 'varchar',
+        'length' => 5,
+        'not NULL' => FALSE,
+        'default' => '',
+      ),
+      'time_added' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not NULL' => TRUE,
+        'length' => 11,
+        'default' => '0',
+      ),       
+    ),
+    'indexes' => array(
+      'find' => array('url', 'browser_language', 'browser_width', 'country'),
+    ),
+    'primary key' => array('id'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Uninstall hook for HeatMap modules.
+ */
+function heatmap_uninstall() {
+  db_delete('variable')->condition('name', 'heatmap_%', 'LIKE')->execute();
+}

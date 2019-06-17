@@ -1,0 +1,82 @@
+.pane-testimonial-detail-block {
+  margin-top: 10px;
+  .node-testimonial {
+    padding-right: 14px;
+    @include breakpoint($tab) {
+      padding-right: 54px;
+    }
+    margin-bottom: 50px;
+    header {
+      display: none;
+    }
+    .content {
+      .field-label {
+        background-color: #ecedee;
+        line-height: 17px;
+        padding: 6px 20px;
+      }
+      .field-item {
+        padding-left: 12px;
+        line-height: 20px;
+        @include breakpoint($tab) {
+          padding-left: 20px;
+        }
+        p {
+          margin: 6px 0 0;
+        }
+        table {
+          max-width: 666px;
+          width: 100% !important;
+          border-collapse: separate;
+        }
+        td {
+          padding: 2px 8px 2px 0;
+          vertical-align: top;
+        }
+        ul {
+          padding-left: 12px;
+        }
+        li {
+          list-style-image: url("../images/bullet-black.png");
+        }
+      }
+    }
+    .field-name-field-event-logo {
+      margin-bottom: 17px;
+      .field-label {
+        display: none;
+      }
+      img {
+        width: auto;
+        max-height: 100px;
+        display: block;
+      }
+      .field-item {
+        padding-left: 0;
+      }
+    }
+    .field-name-field-resource-link {
+      margin-bottom: 12px;
+      .field-label {
+        display: none;
+      }
+      .field-item {
+        background-image: url("../images/download.gif");
+        background-repeat: no-repeat;
+        height: 24px;
+        padding-left: 0;
+        width: 111px;
+        a {
+          font-size: 0;
+          display: block;
+        }
+      }
+    }
+    .field-name-field-benefits .field-item {
+      padding-left: 0;
+      br {
+        display: none;
+      }
+    }
+  }
+}

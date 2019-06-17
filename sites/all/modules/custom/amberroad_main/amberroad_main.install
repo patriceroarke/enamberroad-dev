@@ -1,0 +1,221 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for global functionalities.
+ */
+
+
+/**
+ * Implements hook_install().
+ */
+function amberroad_main_install() {
+  module_load_include('inc', 'amberroad_main', 'amberroad_main.menu');
+
+  // Create "Header, footer and Amberoad main menus".
+  amberroad_main_create_menu();
+
+  // Enable system node_view and term view page.
+  amberroad_main_enable_system_page('node_view');
+  amberroad_main_enable_system_page('term_view');
+
+  // Insert terms in resource_type and career location.
+  amberroad_taxonomy_insert_terms('resource_type');
+  amberroad_taxonomy_insert_terms('career_location');
+  amberroad_main_create_sitemap_menu_item();
+
+  // Enable workbench moderation pages.
+  amberroad_main_enable_system_page('noderevision');
+  amberroad_main_enable_system_page('nodedraft');
+}
+
+/**
+ * Implements hook_update_7000().
+ *
+ * Set resource type for podcast and webinar content type.
+ */
+function amberroad_main_update_7000() {
+  // Update resource type for Podcast content type.
+  $podcasts = node_load_multiple(array(), array('type' => 'podcast'));
+  $resource_type = taxonomy_get_term_by_name('Podcast', 'resource_type');
+  foreach ($podcasts as $podcast) {
+    $podcast_wrapper = entity_metadata_wrapper('node', $podcast);
+    $podcast_wrapper->field_resource_type = key($resource_type);
+    $podcast_wrapper->save();
+  }
+
+  // Update resource type for Webinar content type.
+  $resource_type = taxonomy_get_term_by_name('Webinar', 'resource_type');
+  $webinars = node_load_multiple(array(), array('type' => 'webinar'));
+  foreach ($webinars as $webinar) {
+    $webinar_wrapper = entity_metadata_wrapper('node', $webinar);
+    $webinar_wrapper->field_resource_type = key($resource_type);
+    $webinar_wrapper->save();
+  }
+
+  // Update url in RHS block for page content type.
+  $pages = node_load_multiple(array(), array('type' => 'page'));
+  foreach ($pages as $page) {
+    if (!empty($page->field_rhs_ad_blocks)) {
+      $webinar_wrapper = entity_metadata_wrapper('node', $page);
+      $rhs_blocks = $webinar_wrapper->field_rhs_ad_blocks->value();
+      if (isset($rhs_blocks[3])) {
+        $rhs_blocks_wrapper = entity_metadata_wrapper('field_collection_item', $rhs_blocks[3]->item_id);
+        $rhs_blocks_wrapper->field_ad_link = array('url' => 'http://www.amberroad.com/html/resources.shtml');
+        $rhs_blocks_wrapper->save();
+      }
+    }
+  }
+
+  // Update url in RHS block for solution area content type.
+  $pages = node_load_multiple(array(), array('type' => 'solution_area'));
+  foreach ($pages as $page) {
+    if (!empty($page->field_rhs_ad_blocks)) {
+      $webinar_wrapper = entity_metadata_wrapper('node', $page);
+      $rhs_blocks = $webinar_wrapper->field_rhs_ad_blocks->value();
+      if (isset($rhs_blocks[3])) {
+        $rhs_blocks_wrapper = entity_metadata_wrapper('field_collection_item', $rhs_blocks[3]->item_id);
+        $rhs_blocks_wrapper->field_ad_link = array('url' => 'http://www.amberroad.com/html/resources.shtml');
+        $rhs_blocks_wrapper->save();
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_update_7001().
+ *
+ * Update body field image path for basic pages and solution area.
+ */
+function amberroad_main_update_7001() {
+  global $base_url;
+
+  $pages = node_load_multiple(array(), array('type' => 'page'));
+  foreach ($pages as $node) {
+    if (isset($node->body['und'])) {
+      $html = $node->body['und'][0]['value'];
+
+      // Get the images.
+      $images = amberroad_main_htmlqp($html)->top()->find('img');
+      foreach ($images as $image) {
+        $path = $image->attr('src');
+        if (strpos($path, 'http://amberroad.eng.projspace.com') !== FALSE) {
+          $path = str_replace('http://amberroad.eng.projspace.com','',$path);
+          $image->attr('src', $path);
+        }
+        elseif (strpos($path, 'http://amberroad.com') !== FALSE) {
+          $image_saved = file_get_contents($path);
+          $file_array = explode('/', $path);
+          $file_name = isset($file_array[6]) ? $file_array[6] : $file_array[5];
+          $image->attr('src', '/sites/default/files/images/' . $file_name);
+        }
+      }
+
+      // Update the node body.
+      $html = $images->top('body')->innerHTML();
+      $node->body[$node->language][0]['value'] = $html;
+      node_save($node);
+    }
+  }
+
+  $pages = node_load_multiple(array(), array('type' => 'solution_area'));
+  foreach ($pages as $node) {
+    if (isset($node->body['und'])) {
+      $html = $node->body['und'][0]['value'];
+
+      // Get the images.
+      $images = amberroad_main_htmlqp($html)->top()->find('img');
+      foreach ($images as $image) {
+        $path = $image->attr('src');
+        if (strpos($path, 'http://amberroad.eng.projspace.com') !== FALSE) {
+          $path = str_replace('http://amberroad.eng.projspace.com','',$path);
+          $image->attr('src', $path);
+        }
+        elseif (strpos($path, 'http://amberroad.com') !== FALSE) {
+          $image_saved = file_get_contents($path);
+          $file_array = explode('/', $path);
+          $file_name = isset($file_array[6]) ? $file_array[6] : $file_array[5];
+          $image->attr('src', '/sites/default/files/images/' . $file_name);
+        }
+      }
+
+      // Update the node body.
+      $html = $images->top('body')->innerHTML();
+      $node->body[$node->language][0]['value'] = $html;
+      node_save($node);
+    }
+  }
+}
+
+/**
+ * Implements hook_update_7002().
+ *
+ * Add client banner feauture.
+ */
+function amberroad_main_update_7002() {
+  module_enable(array('amberroad_client_banner', 'views_slideshow_cycle'));
+  features_revert(array('amberroad_pages' => array('page_manager_pages')));
+}
+
+/**
+ * Implements hook_update_7003().
+ *
+ * Feature revert for image field changes.
+ */
+function amberroad_main_update_7003() {
+  features_revert_module('amberroad_awards');
+  features_revert_module('amberroad_basic_page');
+  features_revert_module('amberroad_client_banner');
+  features_revert_module('amberroad_events');
+  features_revert_module('amberroad_podcast');
+  features_revert_module('amberroad_resource');
+  features_revert_module('amberroad_slideshow');
+  features_revert_module('amberroad_solution_area');
+  features_revert_module('amberroad_testimonial');
+}
+
+
+/**
+ * Adds the structured data
+ */
+function amberroad_main_update_7004(){
+
+  $site = variable_get('amberroad_site');
+
+  if($site == 'de') {
+    $site_name = 'Amber Road';
+    $site_url = 'http://de.amberroad.com/';
+    $site_logo = 'http://de.amberroad.com/sites/all/themes/ar_theme/assets/images/amberroad-logo.png';
+    $same_as = array(
+      'https://twitter.com/GTMBestPractice',
+      'https://www.youtube.com/user/GTMBestPractices',
+      'https://www.facebook.com/pages/Amber+Road/507641042664548',
+      'https://plus.google.com/+AmberroadGTM',
+      'https://www.pinterest.com/gtmbestpractice/',
+    );
+    $contact_phone = '+49-89-20003410';
+  }
+  else if($site == 'fr'){
+    $site_name = 'Amber Road';
+    $site_url = 'http://fr.amberroad.com/';
+    $site_logo = 'http://fr.amberroad.com/sites/all/themes/ar_theme/assets/images/amberroad-logo.png';
+    $same_as = array(
+      'https://twitter.com/GTMBestPractice',
+      'https://www.youtube.com/user/GTMBestPractices',
+      'https://www.facebook.com/pages/Amber+Road/507641042664548',
+      'https://plus.google.com/+AmberroadGTM',
+      'https://www.pinterest.com/gtmbestpractice/',
+    );
+    $contact_phone = '+33-1-78423631';
+  }
+
+
+  if($site == 'de' || $site == 'fr'){
+    variable_set('amberroad_structure_data_active', 1);
+    variable_set('amberroad_structure_data_site_name', $site_name);
+    variable_set('amberroad_structure_data_site_url', $site_url);
+    variable_set('amberroad_structure_data_site_logo', $site_logo);
+    variable_set('amberroad_structure_data_same_as', $same_as);
+    variable_set('amberroad_structure_data_site_contact_phone', $contact_phone);
+  }
+
+}

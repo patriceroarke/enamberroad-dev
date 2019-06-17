@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Bean feature.
+ */
+
+include_once 'amberroad_bean.features.inc';

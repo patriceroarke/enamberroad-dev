@@ -1,0 +1,66 @@
+name = Amber Road
+description =  A responsive theme for Amber Road based upon Aurora.
+core = 7.x
+base theme = aurora
+
+; ========================================
+; Regions
+; ========================================
+
+regions[header]               = 'Header'
+regions[main_prefix]          = 'Main Region Prefix'
+regions[content]              = 'Main Region'
+regions[main_suffix]          = 'Main Region Suffix'
+regions[footer_column_left]   = 'Footer Column Left'
+regions[footer_column_middle] = 'Footer Column Middle'
+regions[footer_column_right]  = 'Footer Column Right'
+regions[footer_column_mobile] = 'Footer Column Mobile'
+
+; ========================================
+; Stylesheets
+; ========================================
+
+stylesheets[all][] = 'css/style.css'
+
+; ========================================
+; Scripts
+; ========================================
+
+scripts[] = 'js/script.js'
+scripts[] = 'js/rtp.js'
+
+
+; ========================================
+; Modernizr
+; ========================================
+
+modernizr[tests][] = css_boxsizing
+
+; ========================================
+; Settings
+; ========================================
+
+settings[toggle_node_user_picture] = 1
+settings[toggle_comment_user_picture] = 1
+settings[toggle_comment_user_verification] = 1
+settings[default_logo] = 1
+settings[logo_path] = "logo.png"
+settings[logo_upload] =
+settings[default_favicon] = 1
+settings[favicon_path] = "favicon.ico"
+settings[favicon_upload] =
+settings[hide_recomended_modules] = 0
+settings[aurora_min_ie_support] = 8
+settings[aurora_html_tags] = 1
+settings[aurora_typekit_id] =
+settings[magic_css_excludes] =
+settings[magic_footer_js] = 1
+settings[magic_library_head] = 0
+settings[magic_experimental_js] = 0
+settings[magic_js_excludes] =
+settings[magic_rebuild_registry] = 0
+settings[magic_viewport_indicator] = 0
+settings[magic_modernizr_debug] =
+
+;Plugins
+plugins[panels][layouts] = layouts

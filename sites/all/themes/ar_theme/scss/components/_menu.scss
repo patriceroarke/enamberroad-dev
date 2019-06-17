@@ -1,0 +1,331 @@
+// Styles for Menus and Navs
+// -----------------------------------------------------------------------------
+
+
+
+#footer .nav-pills > li.active > a {
+  background-color:transparent;
+}
+
+#main-menu-mobile ul.menu.nav {
+    display:none!important;
+}
+
+.header-language-shadow {
+  -webkit-box-shadow: 0px 4px 6px 0px rgba(33, 36, 32, 0.45);
+  -moz-box-shadow: 0px 4px 6px 0px rgba(33, 36, 32, 0.45);
+  box-shadow: 0px 4px 6px 0px rgba(33, 36, 32, 0.45);
+}
+
+.header-language {
+  position: relative;
+  height: 39px;
+  border-width: 1px;
+  width: 141px;
+  height: 37px;
+  text-align: center;
+  z-index: 100000;
+  float: right;
+  margin-top: 25px;
+  margin-bottom: -25px;
+  &:hover {
+    cursor: pointer;
+  }
+  span {
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 32px;
+    text-transform: uppercase;
+    color: $ab_default_text_light;
+    &:hover {
+      color: $ab_orange_text;
+    }
+  }
+  ul {
+    background: #fff;
+    margin-top: 4px;
+  }
+  ul li {
+    background: #fff;
+    border-bottom: 1px solid #e1e1e1 ;
+    text-align: left;
+    padding-left: 20px;
+  }
+  ul li:hover {
+    background: $ab_orange_text ;
+    a {
+      color: white;
+    }
+  }
+  ul li:hover a {
+    display: block;
+    text-decoration: none;
+  }
+  ul li a {
+    color: #1a1918 ;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 35px;
+  }
+  #language-option {
+    position:absolute;
+    top:32px;
+    background:#f1f1f1 ;
+    width:250px;
+    display:none;
+  }
+}
+
+
+
+
+
+// Header menu
+#block-menu-menu-header {
+  margin-top:30px;
+  padding-right:20px;
+  margin-bottom: 30px;
+  margin-top: -7px;
+  padding-right: 20px;
+  text-align: right;
+  @media(max-width:554px){
+    float: left;
+  }
+  ul.menu {
+    padding-left: 0;
+    margin: 0;
+    text-align: right;
+    li.leaf {
+      list-style-image: none;
+      list-style-type: unset;
+      display: inline-block;
+      margin: 0;
+      padding: 0 0 3px 4px;
+      a {
+        font-size: 13px;
+        color: $ab_default_text_light;
+        display:inline;
+        text-transform: uppercase;
+        &:hover {
+          font-size: 13px;
+          color: $ab_orange_text;
+        }
+      }
+    }
+  }
+  .nav .open > a, .nav .open > a:hover, .nav .open > a:focus, .nav > li > a:hover, .nav > li > a:focus {
+    background-color:inherit;
+  }
+  ul li.leaf a:hover {
+  }
+}
+
+.mean-container {
+  .mean-bar, .mean-nav, .mean-nav ul li a.mean-expand:hover {
+    background: $ab_grey_dark;
+  }
+}
+
+.slideInDown {
+  #superfish-1 {
+    float:right;
+    margin-top:5px;
+    margin-left:inherit;
+  }
+}
+
+ul#superfish-1 a {
+  color:$ab_default_text;
+}
+
+#superfish-1 {
+
+  li#menu-4210-1 a, li#menu-4211-1 a {
+    text-transform: inherit;
+  }
+
+  @media (max-width: 991px) {
+    display:none!important;
+  }
+  @media (min-width: 1200px) {
+    margin-left:140px;
+  }
+  position:relative;
+  margin-bottom:4px;
+  z-index:10000;
+  li {
+    line-height:25px;
+  }
+  // top level
+  > li {
+    // the following rules are overridden in the language specific files
+/*    margin-right:10px;
+    padding-right:10px;*/
+    > a .sf-sub-indicator {
+      top: 19px;
+      /* background-position: 0 -100px; */
+      right: 0px;
+    }
+    > a {
+      text-transform: uppercase;
+    }
+  }
+  a, span.nolink {
+    color: $ab_default_text_light;
+    padding:15px;
+    font-size:15px;
+    &:hover {
+      color: $ab_orange_text;
+      text-decoration:none;
+      .sf-sub-indicator {
+        background-image: url('/sites/all/libraries/superfish/images/arrows-ffffff.png');
+      }
+    }
+  }
+  li.active-trail {
+    background-color: $ab_orange_text;
+    > a, > span.nolink {
+      color: white;
+    }
+  }
+  ul {
+    padding: 10px 10px!important;
+    background-image: none;
+    background-color: white;
+    border-bottom:3px solid $ab_orange_text;
+    border-radius:0px;
+    li {
+      &:hover {
+        background-color:$ab_orange_text;
+        > a, > span.nolink {
+          color:white;
+        }
+      }
+    }
+    a, span.nolink {
+      padding:5px 0 5px 5px;
+      font-size: 14px;
+    }
+    ul {
+      border-left:1px solid $ab_grey_lightest;
+    }
+  }
+  > ul {
+    //left: -20px;
+  }
+  .sf-sub-indicator {
+    background-image: url('/sites/all/libraries/superfish/images/arrows-777777.png');
+  }
+}
+
+#main-menu {
+  margin-bottom:4px;
+}
+
+
+#horizontal-submenu-select select#edit-jump {
+  margin: 0 auto;
+  width:inherit;
+  display:none;
+  @media (max-width: 991px) {
+    display:block;
+  }
+}
+
+#horizontal-submenu {
+  width: 1100px;
+  text-align: center;
+  height: 40px;
+  clear: both;
+  margin-bottom:50px;
+  @media (min-width: 992px) and (max-width: 1199px) {
+    width:inherit;
+  }
+  @media (max-width: 991px) {
+    display:none;
+  }
+  .nav > li
+  {
+    display:inline;
+    > a {
+      position: initial;
+      display: inline;
+      padding: 0;
+    }
+
+  }
+
+  ul.nav {
+    margin: 0;
+    padding: 0;
+    background-color:$ab_bg;
+    list-style: none;
+    ul {
+      display: none;
+    }
+  }
+
+  ul.nav li {
+    display: inline;
+  }
+
+  ul.nav li a {
+    float: left;
+    line-height: 40px;
+    color: $ab_orange_text;
+    text-decoration: none;
+    margin: 0;
+    padding: 0 25px;
+  }
+
+  /* APPLIES THE ACTIVE STATE */
+  ul.nav .current a, ul.nav li:hover > a {
+    color: $orange;
+    text-decoration: none;
+    background: $ab_grey_lightest;
+  }
+
+
+
+  /* WHEN THE FIRST LEVEL MENU ITEM IS HOVERED, THE CHILD MENU APPEARS */
+  ul.nav li:hover > ul {
+    position: absolute;
+    display: block;
+    width: 909px;
+    height: 45px;
+    margin: 40px 0 0 0;
+    background-color: $ab_bg;
+    padding-left:40px;
+  }
+
+
+  ul.nav li:hover > ul li a {
+    float: left;
+    line-height: 45px;
+    color: $ab_orange_text;
+    text-decoration: none;
+    margin: 0;
+    //padding: 0 30px 0 0;
+  }
+
+  ul.nav li:hover > ul li a:hover {
+    color: $orange;
+    text-decoration: none;
+    text-shadow: none;
+  }
+}
+
+#footer {
+  .nav {
+    li {
+      line-height:25px;
+    }
+    > li > a {
+      padding-top:2px;
+      padding-bottom: 2px;
+      &:focus {
+        background-color:inherit;
+      }
+    }
+  }
+}

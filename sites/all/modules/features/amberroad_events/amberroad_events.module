@@ -1,0 +1,139 @@
+<?php
+/**
+ * @file
+ * Code for the Amberroad Events feature.
+ */
+
+include_once 'amberroad_events.features.inc';
+
+/**
+ * Implements hook_events_views_pre_render().
+ */
+function amberroad_events_views_pre_render(&$view) {
+  // Add external link to event logo.
+  if ($view->name == 'events') {
+    $result = $view->result;
+    foreach ($result as $row) {
+      if (isset($row->field_field_event_logo) && isset($row->field_field_event_link[0]['raw']['url'])) {
+        $row->field_field_event_logo[0]['rendered']['#path']['path'] = $row->field_field_event_link[0]['raw']['url'];
+      }
+
+      // Format the date for industry event.
+      if (isset($row->field_field_event_date) && $row->field_field_event_date[0]['raw']['value2'] != NULL) {
+        $start_date = $row->field_field_event_date[0]['raw']['value'];
+        $end_date = $row->field_field_event_date[0]['raw']['value2'];
+        if ($start_date != $end_date) {
+          $month = date('n', strtotime($start_date));
+          $month2 = date('n', strtotime($end_date));
+
+          $amberroad_site = variable_get('amberroad_site');
+
+          if($amberroad_site == 'de' || $amberroad_site == 'fr' || $amberroad_site == 'it'){
+            if ($month == $month2) {
+              $date = date(' j', strtotime($start_date)) . '-' . date('j', strtotime($end_date)) . ' ' . t(date('F', strtotime($end_date))) . ' ' . date('Y', strtotime($end_date));
+              $row->field_field_event_date[0]['rendered']['#markup'] = '<div class="industry-event-date">' . $date . '</div>';
+            }
+            else {
+              $date = date(' j', strtotime($start_date)) . ' ' . t(date('F', strtotime($start_date))) .  ' - ' . t(date('j', strtotime($end_date))) . ' ' . t(date('F', strtotime($end_date)) . ' ' . date('Y', strtotime($end_date)));
+              $row->field_field_event_date[0]['rendered']['#markup'] = '<div class="industry-event-date">' . $date . '</div>';
+            }
+          }
+          else {
+            if ($month == $month2) {
+              $date = t(date('F', strtotime($start_date))) . date(' j', strtotime($start_date)) . '-' . date('j, Y', strtotime($end_date));
+              $row->field_field_event_date[0]['rendered']['#markup'] = '<div class="industry-event-date">' . $date . '</div>';
+            }
+            else {
+              $date = t(date('F', strtotime($start_date))) . date(' j', strtotime($start_date)) . ' - ' . t(date('F', strtotime($end_date))) . date(' j, Y', strtotime($end_date));
+              $row->field_field_event_date[0]['rendered']['#markup'] = '<div class="industry-event-date">' . $date . '</div>';
+            }
+          }
+
+        }
+      }
+    }
+  }
+
+  // Alter home page blocks view.
+  if ($view->name == 'homepage_blocks') {
+    $result = $view->result;
+    foreach ($result as $row) {
+      if (!empty($row->field_field_event_block_image)) {
+        $row->node_title = '';
+        unset($view->field['nothing']);
+        $row->field_field_event_block_image[0]['rendered']['#path']['path'] = $row->field_field_event_link[0]['raw']['url'];
+
+        // Hide the additional fields if image block field is set.
+        if ($view->current_display == 'webinar_block') {
+          unset($row->field_field_event_date_and_time);
+        }
+        if ($view->current_display == 'event_block') {
+          unset($row->field_field_event_date);
+          unset($row->field_field_event_city_and_state);
+        }
+
+        unset($row->field_field_event_logo);
+        unset($row->field_body);
+        unset($row->field_field_event_link);
+      }
+      elseif (isset($row->field_field_event_logo)) {
+        $row->field_field_event_logo[0]['rendered']['#path']['path'] = $row->field_field_event_link[0]['raw']['url'];
+      }
+    }
+  }
+}
+
+/**
+ * Create menu items for Events type under COMPANY menu item.
+ */
+function amberroad_events_create_menu_items() {
+  $mlid = amberroad_main_mlid_load('amberroad-main-menu', 'Events');
+  $items = array(
+    array(
+      'link_path' => 'html/industry_events.shtml',
+      'link_title' => 'Industry Conferences',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 0,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+    array(
+      'link_path' => 'html/seminars.shtml',
+      'link_title' => 'Seminars',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 1,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+    array(
+      'link_path' => '<front>',
+      'link_title' => 'User Conference - eVOLVE',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 2,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+    array(
+      'link_path' => 'html/webinars.shtml',
+      'link_title' => 'Upcoming Webinars',
+      'menu_name' => 'amberroad-main-menu',
+      'weight' => 3,
+      'plid' => $mlid,
+      'module' => 'menu',
+    ),
+  );
+
+  foreach ($items as $item) {
+    menu_link_save($item);
+  }
+
+}
+
+/**
+ * Implements hook_date_format_types().
+ */
+function amberroad_events_date_format_types() {
+  return array(
+    'event_date' => t('Event Date'),
+  );
+}

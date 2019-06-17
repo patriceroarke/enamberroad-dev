@@ -1,0 +1,23 @@
+.page-user {
+  #main form {
+    padding: 20px 15px 40px 15px;
+    @include breakpoint($tab) {
+      padding-left: 40px;
+      padding-right: 20px;
+    }
+    label {
+      font-size: 13px;
+    }
+    .form-text {
+      width: 280px;
+      @include breakpoint($tab) {
+        width: 300px;
+      }
+    }
+    .form-submit {
+      @extend .btn--orange;
+      height: 24px;
+      font-size: 12px;
+    }
+  }
+}

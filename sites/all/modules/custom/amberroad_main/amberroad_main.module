@@ -1,0 +1,135 @@
+<?php
+/**
+ * @file
+ * Code for the Blocks feature.
+ */
+
+/**
+ * Enable system page.
+ */
+function amberroad_main_enable_system_page($page_name) {
+  $page = page_manager_get_page_cache($page_name);
+  $function = ctools_plugin_get_function($page->subtask, 'enable callback');
+  $result = $function($page, FALSE);
+  menu_rebuild();
+}
+
+/**
+ * Load mlid by menu name and link title.
+ */
+function amberroad_main_mlid_load($menu_name, $link_title) {
+  $menu_info = array();
+  $link_title = $link_title;
+  $menu_name = $menu_name;
+  $menu_info = db_select('menu_links' , 'ml')
+  ->condition('ml.link_title' , $link_title)
+  ->condition('ml.menu_name' , $menu_name)
+  ->fields('ml', array('mlid'))
+  ->execute()
+  ->fetchAssoc();
+
+  return $menu_info['mlid'];
+}
+
+/**
+ * Set path for existing menu item.
+ *
+ * @param  [menu_name] [Name of menu]
+ * @param  [link_title] [Title of link]
+ * @param  [options] [Pass menu item with keys in array]
+ *   array(
+ *   'link_path' => '[Path]',
+ *   'link_title' => ['Title'],
+ *   )
+ */
+function amberroad_main_alter_menu_item($menu_name, $link_title, $options) {
+  $mlid = amberroad_main_mlid_load($menu_name, $link_title);
+  $menu_item = menu_link_load($mlid);
+
+  foreach ($options as $key => $value) {
+    $menu_item[$key] = $options[$key];
+  }
+  menu_link_save($menu_item);
+}
+
+/**
+ * Hide search text field and submit handler in search form.
+ */
+function amberroad_main_form_search_form_alter(&$form, &$form_state) {
+  $form['basic']['#access'] = FALSE;
+}
+
+/**
+ * Implement hook_form_FORM_ID_alter().
+ */
+function amberroad_main_form_node_form_alter(&$form, $form_state) {
+  $type = $form['#node']->type;
+  if ($type == 'podcast' || $type == 'webinar') {
+    $form['field_resource_type']['#access'] = FALSE;
+  }
+}
+
+/**
+  * Init.
+  * @param $html
+  *  The full HTML data as loaded from the file.
+  */
+function amberroad_main_htmlqp($html) {
+    $html = str_replace(chr(13), '', $html);
+    $enc = mb_detect_encoding($html, 'UTF-8', TRUE);
+    if (!$enc) {
+      $html = mb_convert_encoding($html, 'UTF-8', 'WINDOWS-1252');
+    }
+    $tmp = $html;
+    // We add surrounding <html> and <head> tags.
+    $html = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
+    $html .= '<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>';
+    $html .= $tmp;
+    $html .= '</body></html>';
+    $qp_options = array(
+      'convert_to_encoding' => 'utf-8',
+      'convert_from_encoding' => 'utf-8',
+      'strip_low_ascii' => FALSE,
+    );
+
+    return $qp = htmlqp($html, NULL, $qp_options);
+  }
+
+
+
+/**
+ * Implements hook_init().
+ *
+ */
+function amberroad_main_init() {
+
+  global $conf;
+
+  // Adds the language specific css file
+  $amberroad_site = variable_get('amberroad_site');
+  if($amberroad_site){
+    drupal_add_css('sites/all/themes/ar_theme/assets/css/ar_theme_'.$amberroad_site.'.css', array(
+      'type' => 'file',
+      'group' => CSS_THEME,
+    ));
+  }
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function amberroad_main_menu_alter(&$items) {
+
+  // Disallow the default Blog paths for CN site
+  $site = variable_get('amberroad_site');
+  if($site == 'cn'){
+    $items['blog']['access arguments'] = array();
+    $items['blog/%user_uid_optional']['access arguments'] = array();
+    $items['blog/%user/feed']['access arguments'] = array();
+    $items['blog/feed']['access arguments'] = array();
+  }
+
+  $items['aggregator/sources/%aggregator_feed']['access arguments'] = array();
+  $items['aggregator/sources']['access arguments'] = array();
+
+}

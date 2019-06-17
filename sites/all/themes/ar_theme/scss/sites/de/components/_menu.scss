@@ -1,0 +1,23 @@
+#superfish-1 {
+  @media (min-width: 1200px) {
+    margin-left:190px;
+  }
+  // top level
+  > li {
+    margin-right:30px;
+    padding-right:30px;
+  }
+
+  li#menu-641-1 ul {
+    width:215px!important;
+  }
+  li#menu-524-1 ul {
+    width:340px!important;
+  }
+  li#menu-594-1 ul {
+    width:230px!important;
+  }
+  li#menu-608-1 ul {
+    width:225px!important;
+  }
+}

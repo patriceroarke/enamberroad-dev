@@ -1,0 +1,14 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the amberroad pages.
+ */
+
+/**
+ * Implements hook_update().
+ *
+ * Revert the feature to update panel layout and classes for Resoure Search Page.
+ */
+function amberroad_pages_update_7001() {
+  features_revert(array('amberroad_pages'));
+}

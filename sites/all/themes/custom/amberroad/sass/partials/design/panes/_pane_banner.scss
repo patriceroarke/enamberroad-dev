@@ -1,0 +1,72 @@
+.not-front .panels-generic-content-banner-inside {
+  border-bottom-width: 6px;
+  border-bottom-style: solid;
+  border-bottom-color: $saffron;
+  position: relative;
+  @include breakpoint($tab) {
+    border-bottom-width: 17px;
+  }
+  .pane-title {
+    display: none;
+  }
+  .field-name-field-header-image, .amberroad-banner, .field-name-field-banner-image {
+    img {
+      border-bottom-width: 4px;
+      border-bottom-style: solid;
+      border-bottom-color: $grey-shade-5;
+      display: block;
+      @include breakpoint($tab) {
+        border-bottom-width: 12px;
+      }
+    }
+  }
+  .field-name-field-banner-image img {
+    min-height: 130px;
+  }
+  .dynamic-banner-wrapper {
+    background-color: rgba(255, 200, 46, 0.85);
+    padding: 5px 10px;
+    position: absolute;
+    width: 70%;
+    border-bottom: 3px solid #d77600;
+    top: 16%;
+    @include breakpoint(481px 767px) {
+      padding: 10px 14px;
+    }
+    @include breakpoint($tab) {
+      border-bottom-width: 11px;
+      width: 56%;
+      padding: 11px 40px 11px 25px;
+      top: 18%;
+    }
+    .field.field-name-field-caption-title .field-item {
+      font-size: 13px;
+      font-weight: bold;
+      font-family: $font-avenir-heavy;
+      line-height: 22px;
+      @include breakpoint(481px 767px) {
+        font-size: 15px;
+      }
+      @include breakpoint($tab) {
+        font-size: 24px;
+        line-height: 24px;
+        padding-bottom: 8px;
+      }
+    }
+    .field-name-field-caption-descrption .field-item {
+      font-size: 11px;
+      line-height: 16px;
+      font-family: $font-avenir-light;
+      max-height: 48px;
+      overflow: hidden;
+      @include breakpoint(481px 767px) {
+        font-size: 13px;
+      }
+      @include breakpoint($tab) {
+        font-size: 17px;
+        line-height: 24px;
+        max-height: 73px;
+      }
+    }
+  }
+}

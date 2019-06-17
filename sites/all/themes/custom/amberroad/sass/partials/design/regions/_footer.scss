@@ -1,0 +1,45 @@
+#footer {
+  background-color: #cfd4d6;
+  min-height: 80px;
+  overflow: hidden;
+  padding: 1px 0;
+  position: relative;
+  .l-region h2 {
+    display: none;
+  }
+}
+
+.l-region--footer-column-left {
+  display: none;
+  @include layout-at(12, $tab) {
+    @include grid-span(3,1);
+    display: block;
+  }
+  padding-left: 25px;
+}
+
+.l-region--footer-column-middle {
+  line-height: 20px;
+  @include layout-at(12, $tab) {
+    @include grid-span(6,4);
+  }
+  @include breakpoint ($desk) {
+    padding-left: 26px;
+  }
+}
+
+.l-region--footer-column-right {
+  display: none;
+  @include layout-at(12, $tab) {
+    @include grid-span(3,10);
+    display: block;
+  }
+}
+
+.l-region--footer-column-mobile {
+  @include breakpoint($tab) {
+    display: none;
+  }
+  text-align: center;
+  padding-top: 24px;
+}
